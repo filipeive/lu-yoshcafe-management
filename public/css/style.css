@@ -1,0 +1,59 @@
+/* Estilos customizados */
+/* Cores quentes */
+:root {
+    --primary-color: #ff6b6b;
+    --secondary-color: #feca57;
+    --accent-color: #ff9ff3;
+  }
+  
+  /* Personalização dos botões grandes */
+  .btn-lg {
+    padding: 15px 25px;
+    font-size: 18px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-lg:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Cores personalizadas para os botões */
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .btn-success {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+  }
+  
+  .btn-info {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+  }
+  
+  /* Personalização do sidebar */
+  .sidebar {
+    background-color: #fff3e0;
+  }
+  
+  .sidebar .nav-item .nav-link {
+    color: #ff6b6b;
+  }
+  
+  .sidebar .nav-item .nav-link.active {
+    background-color: #ffe0b2;
+  }
+  
+  /* Personalização do navbar */
+  .navbar {
+    background-color: #fff3e0;
+  }
+  
+  /* Personalização do conteúdo principal */
+  .content-wrapper {
+    background-color: #fff9c4;
+  }
