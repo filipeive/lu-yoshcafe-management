@@ -5,20 +5,8 @@ require_login();
 $pageTitle = "Vendas";
 include '../includes/header.php';
 
-// Pagination setup
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$per_page = 6;
-$offset = ($page - 1) * $per_page;
-
-// Get total number of sales and paginated sales
-$total_sales = count_all_sales();
-$total_pages = ceil($total_sales / $per_page);
-$sales = get_paginated_sales($offset, $per_page);
-
+$sales = get_all_sales();
 $products = get_all_products();
-
-//$sales = get_all_sales();
-//$products = get_all_products();
 ?>
 
 <div class="row">
@@ -26,6 +14,7 @@ $products = get_all_products();
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title">Vendas</h4>
+                <p class="mb-md-0">Gerencie suas vendas aqui.</p><br>
                 <p class="card-description">
                     <button type="button" class="btn btn-primary mt-2 mt-xl-0" data-bs-toggle="modal"
                         data-bs-target="#newSaleModal">
@@ -72,22 +61,6 @@ $products = get_all_products();
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
-                                </div>
-                                <!-- Pagination controls -->
-                                <div class="d-flex justify-content-between mt-4">
-                                    <?php if ($page > 1): ?>
-                                    <a href="?page=<?php echo $page - 1; ?>" class="btn btn-primary">Anterior</a>
-                                    <?php else: ?>
-                                    <button class="btn btn-primary" disabled>Anterior</button>
-                                    <?php endif; ?>
-
-                                    <span>Página <?php echo $page; ?> de <?php echo $total_pages; ?></span>
-
-                                    <?php if ($page < $total_pages): ?>
-                                    <a href="?page=<?php echo $page + 1; ?>" class="btn btn-primary">Próximo</a>
-                                    <?php else: ?>
-                                    <button class="btn btn-primary" disabled>Próximo</button>
-                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -168,11 +141,9 @@ $products = get_all_products();
         </div>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
 let saleItems = [];
+
 document.getElementById('addItemButton').addEventListener('click', function() {
     const productSelect = document.getElementById('product');
     const product = productSelect.options[productSelect.selectedIndex];
@@ -194,7 +165,7 @@ document.getElementById('addItemButton').addEventListener('click', function() {
 
     saleItems.push(item);
     updateSaleItemsTable();
-
+    
     // Resetar campos
     document.getElementById('quantity').value = 1;
     productSelect.selectedIndex = 0;
@@ -236,35 +207,35 @@ document.getElementById('finalizeSaleButton').addEventListener('click', function
     const paymentMethod = document.getElementById('paymentMethod').value;
 
     fetch('gerir_vendas/process_sale.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                items: saleItems,
-                paymentMethod: paymentMethod
-            })
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            items: saleItems,
+            paymentMethod: paymentMethod
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Venda realizada com sucesso!');
-                // Abrir o recibo em uma nova janela
-                window.open(data.receiptUrl, '_blank');
-                // Fechar o modal e limpar os itens
-                $('#newSaleModal').modal('hide');
-                saleItems = [];
-                updateSaleItemsTable();
-                // Recarregar a página para atualizar o histórico de vendas
-                location.reload();
-            } else {
-                alert('Erro ao realizar a venda: ' + data.message);
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            alert('Erro ao processar a venda.');
-        });
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Venda realizada com sucesso!');
+            // Abrir o recibo em uma nova janela
+            window.open(data.receiptUrl, '_blank');
+            // Fechar o modal e limpar os itens
+            $('#newSaleModal').modal('hide');
+            saleItems = [];
+            updateSaleItemsTable();
+            // Recarregar a página para atualizar o histórico de vendas
+            location.reload();
+        } else {
+            alert('Erro ao realizar a venda: ' + data.message);
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        alert('Erro ao processar a venda.');
+    });
 });
 
 function viewSaleDetails(saleId) {
@@ -272,8 +243,117 @@ function viewSaleDetails(saleId) {
 }
 
 function printReceipt(saleId) {
-    window.open('print_receipt.php?id=' + saleId, /*'_blank'*/ );
+    window.open('print_receipt.php?id=' + saleId, /*'_blank'*/);
 }
+</script>
+
+<?php include '../includes/footer.php'; ?>
+
+
+
+
+<?php
+require_once '../config/config.php';
+require_login();
+
+$pageTitle = "Vendas";
+include '../includes/header.php';
+
+// Pagination setup
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$per_page = 7;
+$offset = ($page - 1) * $per_page;
+
+// Get total number of sales and paginated sales
+$total_sales = count_all_sales();
+$total_pages = ceil($total_sales / $per_page);
+$sales = get_paginated_sales($offset, $per_page);
+
+$products = get_all_products();
+?>
+
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Vendas</h4>
+                <p class="mb-md-0">Gerencie suas vendas aqui.</p><br>
+                <p class="card-description">
+                    <button type="button" class="btn btn-primary mt-2 mt-xl-0" data-bs-toggle="modal"
+                        data-bs-target="#newSaleModal">
+                        Nova Venda
+                    </button>
+                </p>
+                <div class="row">
+                    <div class="col-md-12 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Histórico de Vendas</h4>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Data</th>
+                                                <th>Total</th>
+                                                <th>Método de Pagamento</th>
+                                                <th>Status</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($sales as $sale): ?>
+                                            <tr>
+                                                <td><?php echo $sale['id']; ?></td>
+                                                <td><?php echo $sale['sale_date']; ?></td>
+                                                <td>MZN <?php echo number_format($sale['total_amount'], 2); ?></td>
+                                                <td><?php echo $sale['payment_method']; ?></td>
+                                                <td><?php echo $sale['status']; ?></td>
+                                                <td>
+                                                    <button class="btn btn-outline-primary btn-sm"
+                                                        onclick="viewSaleDetails(<?php echo $sale['id']; ?>)">Ver
+                                                        Detalhes</button>
+                                                    <button class="btn btn-outline-info btn-sm"
+                                                        onclick="printReceipt(<?php echo $sale['id']; ?>)">Imprimir
+                                                        Recibo</button>
+                                                    <button class="btn btn-outline-danger btn-sm"
+                                                        onclick="delete_order(<?php echo $sale['id']; ?>)">Cancelar
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Pagination controls -->
+                                <div class="d-flex justify-content-between mt-4">
+                                    <?php if ($page > 1): ?>
+                                        <a href="?page=<?php echo $page - 1; ?>" class="btn btn-primary">Anterior</a>
+                                    <?php else: ?>
+                                        <button class="btn btn-primary" disabled>Anterior</button>
+                                    <?php endif; ?>
+                                    
+                                    <span>Página <?php echo $page; ?> de <?php echo $total_pages; ?></span>
+                                    
+                                    <?php if ($page < $total_pages): ?>
+                                        <a href="?page=<?php echo $page + 1; ?>" class="btn btn-primary">Próximo</a>
+                                    <?php else: ?>
+                                        <button class="btn btn-primary" disabled>Próximo</button>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal para Nova Venda -->
+    <!-- ... (rest of the modal code remains unchanged) ... -->
+</div>
+
+<script>
+// ... (rest of the JavaScript code remains unchanged) ...
 </script>
 
 <?php include '../includes/footer.php'; ?>

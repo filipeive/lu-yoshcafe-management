@@ -29,7 +29,7 @@
   <script src="../public/assets/js/todolist.js"></script>
   <!-- endinject -->
   <!-- Custom js for this page-->
-  <!--<script src="../public/custom/custom.js"></script>-->
+  <script src="../public/custom/custom.js"></script>
   <!-- End custom js for this page-->
 </body>
 </html>

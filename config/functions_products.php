@@ -50,7 +50,13 @@ function get_product_by_id($id) {
     // Retorna o produto se encontrado
     return $stmt->fetch();
 }
-
+// Adicione esta função se ainda não existir
+function get_product_name($product_id) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT name FROM products WHERE id = ?");
+    $stmt->execute([$product_id]);
+    return $stmt->fetchColumn();
+}
 
 // Funções de Categorias
 function get_all_categories() {
@@ -79,3 +85,39 @@ function get_low_stock_products() {
     $stmt = $pdo->query("SELECT COUNT(*) FROM products WHERE stock_quantity < 10");
     return $stmt->fetchColumn();
 }
+function get_available_products() {
+    global $pdo; // Supondo que você tenha uma conexão PDO estabelecida
+    $stmt = $pdo->query("SELECT id, name, price FROM products WHERE stock_quantity > 0");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+function add_item_to_order($order_id, $product_id, $quantity) {
+    global $pdo;
+
+    // Verifique se o pedido existe
+    $stmt = $pdo->prepare("SELECT * FROM orders WHERE id = ?");
+    $stmt->execute([$order_id]);
+    $order = $stmt->fetch();
+
+    if (!$order) {
+        throw new Exception("Pedido não encontrado.");
+    }
+
+    // Verifique se o produto existe
+    $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
+    $stmt->execute([$product_id]);
+    $product = $stmt->fetch();
+
+    if (!$product) {
+        throw new Exception("Produto não encontrado.");
+    }
+
+    // Adicione o item ao pedido sem incluir o preço na inserção
+    $stmt = $pdo->prepare("INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)");
+    $stmt->execute([$order_id, $product_id, $quantity]);
+
+    // Opcional: Atualize o total do pedido, se necessário
+    $total_amount = $order['total_amount'] + ($product['price'] * $quantity); // Você pode precisar de uma coluna 'total_amount' na tabela 'orders'.
+    $stmt = $pdo->prepare("UPDATE orders SET total_amount = ? WHERE id = ?");
+    $stmt->execute([$total_amount, $order_id]);
+}
+

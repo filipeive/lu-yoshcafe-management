@@ -97,3 +97,22 @@ function cancel_sale($sale_id) {
     $stmt = $pdo->prepare("UPDATE sales SET status = 'cancelled' WHERE id = ?");
     return $stmt->execute([$sale_id]);
 }
+function count_all_sales() {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM sales");
+    $stmt->execute();
+    return $stmt->fetch()['count'];
+}
+
+function get_paginated_sales($offset, $per_page) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM sales ORDER BY sale_date DESC LIMIT :offset, :per_page");
+    
+    // PDO usa bindValue para parâmetros nomeados ou posicionais
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->bindValue(':per_page', $per_page, PDO::PARAM_INT);
+
+    $stmt->execute();
+    
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}

@@ -8393,14 +8393,14 @@
   --bs-gray-700: #495057;
   --bs-gray-800: #343a40;
   --bs-gray-900: #212529;
-  --bs-primary: #1F3BB3;
-  --bs-secondary: #F1F1F1;
-  --bs-success: #34B1AA;
-  --bs-info: #52CDFF;
-  --bs-warning: #ffaf00;
-  --bs-danger: #F95F53;
-  --bs-light: #fbfbfb;
-  --bs-dark: #1E283D;
+  --bs-primary: #8B4513; /* Marrom escuro, inspirado em madeira */
+  --bs-secondary: #2E2E2E; /* Cinza escuro para contrastar com o fundo */
+  --bs-success: #A0522D; /* Tom de cobre que combina com a estética de restaurante */
+  --bs-info: #708090; /* Cinza ardósia para informações */
+  --bs-warning: #FF8C00; /* Laranja queimado, ótimo para alertas e destaques */
+  --bs-danger: #CD5C5C; /* Vermelho suave para erros */
+  --bs-light: #3A3A3A; /* Cinza médio, um tom escuro para fundos leves */
+  --bs-dark: #1C1C1C; /* Preto quase absoluto para fundo geral */
   --bs-primary-rgb: 31, 59, 179;
   --bs-secondary-rgb: 241, 241, 241;
   --bs-success-rgb: 52, 177, 170;
@@ -8442,11 +8442,11 @@
   --bs-body-font-size: 1rem;
   --bs-body-font-weight: 400;
   --bs-body-line-height: 1.5;
-  --bs-body-color: #1F1F1F;
+  --bs-body-color:  #F5F5F5;
   --bs-body-color-rgb: 31, 31, 31;
-  --bs-body-bg: #fff;
+  --bs-body-bg:#ffffff;
   --bs-body-bg-rgb: 255, 255, 255;
-  --bs-emphasis-color: #000;
+  --bs-emphasis-color: #ec8b3b;
   --bs-emphasis-color-rgb: 0, 0, 0;
   --bs-secondary-color: rgba(33, 37, 41, 0.75);
   --bs-secondary-color-rgb: 33, 37, 41;
@@ -8567,7 +8567,7 @@ body {
   text-align: var(--bs-body-text-align);
   background-color: var(--bs-body-bg);
   -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
 }
 
 hr {

@@ -25,35 +25,48 @@ $sales_values = array_values($sales_data);
 include '../includes/header.php';
 
 ?>
+<style>
+/* css para tornar texto branco e fundo escuro */
+.text-white {
+    color: #fff;
+}
 
+/* css para tornar texto preto e fundo claro */
+.text-dark {
+    color: #333;
+}
+</style>
 <!-- partial -->
 <div class="row">
     <div class="col-sm-12">
         <div class="home-tab">
             <div class="tab-content tab-content-basic">
                 <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
+
                     <!-- Estatísticas Rápidas - Cards maiores e coloridos -->
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="statistics-details d-flex align-items-center justify-content-between">
                                 <div class="card-stat bg-primary text-white rounded p-4 m-2">
-                                    <p class="statistics-title">Vendas Hoje</p>
-                                    <h3 class="rate-percentage">MZN
+                                    <p class="statistics-title" style="color:#fff;">Vendas Hoje</p>
+                                    <h3 class="rate-percentage" style="color:#fff;">MZN
                                         <?php echo number_format($total_sales_today, 2, ',', '.'); ?></h3>
                                 </div>
                                 <div class="card-stat bg-success text-white rounded p-4 m-2">
-                                    <p class="statistics-title">Pedidos Abertos</p>
-                                    <h3 class="rate-percentage"><?php echo $open_orders; ?></h3>
+                                    <p class="statistics-title" style="color:#fff;">Pedidos Abertos</p>
+                                    <h3 class="rate-percentage" style="color:#fff;"><?php echo $open_orders; ?></h3>
                                 </div>
                                 <div class="card-stat bg-danger text-white rounded p-4 m-2">
-                                    <p class="statistics-title">Produtos com Estoque Baixo</p>
-                                    <h3 class="rate-percentage"><?php echo $low_stock_products; ?></h3>
+                                    <p class="statistics-title" style="color:#fff;">Produtos com Estoque Baixo</p>
+                                    <h3 class="rate-percentage" style="color:#fff;"><?php echo $low_stock_products; ?>
+                                    </h3>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                     <!-- Ações Rápidas - Botões maiores e coloridos -->
-                    <div class="row col-sm-12" style="margin-top: -20px;">
+                    <div class="row mt-4">
                         <div class="col-lg-8 d-flex flex-column">
                             <div class="row flex-grow">
                                 <div class="col-12 grid-margin stretch-card">
@@ -97,6 +110,7 @@ include '../includes/header.php';
                                     </div>
                                 </div>
                             </div>
+
                             <!-- Vendas Semanais - Gráfico -->
                             <div class="col-12 grid-margin stretch-card">
                                 <div class="card card-rounded shadow">
@@ -107,6 +121,7 @@ include '../includes/header.php';
                                 </div>
                             </div>
                         </div>
+
                         <!-- Controle de Mesas -->
                         <div class="col-lg-4 d-flex flex-column">
                             <div class="col-12 grid-margin stretch-card">
@@ -146,8 +161,6 @@ include '../includes/header.php';
                             </div>
                         </div>
                     </div>
-                    <!-- Modal para Nova Venda -->
-
                     <!-- Modal para Nova Venda -->
                     <div class="modal fade" id="newSaleModal" tabindex="-1" aria-labelledby="newSaleModalLabel"
                         aria-hidden="true">
@@ -246,141 +259,12 @@ include '../includes/header.php';
                 </div>
             </div>
         </div>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js">
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+        <script src="../public/custom.js"></script>
+
     </div>
 </div>
-
-<script>
-let saleItems = [];
-document.getElementById('addItemButton').addEventListener('click', function() {
-    const productSelect = document.getElementById('product');
-    const product = productSelect.options[productSelect.selectedIndex];
-    const quantity = document.getElementById('quantity').value;
-    const price = parseFloat(product.dataset.price);
-
-    if (quantity <= 0) {
-        alert('Por favor, insira uma quantidade válida.');
-        return;
-    }
-
-    const item = {
-        id: product.value,
-        name: product.text.split(' - ')[0], // Pega apenas o nome do produto
-        quantity: parseInt(quantity),
-        price: price,
-        total: price * parseInt(quantity)
-    };
-
-    saleItems.push(item);
-    updateSaleItemsTable();
-
-    // Resetar campos
-    document.getElementById('quantity').value = 1;
-    productSelect.selectedIndex = 0;
-});
-
-function updateSaleItemsTable() {
-    const tableBody = document.querySelector('#saleItemsTable tbody');
-    const totalAmountElement = document.getElementById('saleTotalAmount');
-    let totalAmount = 0;
-
-    tableBody.innerHTML = '';
-
-    saleItems.forEach((item, index) => {
-        const row = tableBody.insertRow();
-        row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.quantity}</td>
-            <td>MZN ${item.price.toFixed(2)}</td>
-            <td>MZN ${item.total.toFixed(2)}</td>
-            <td><button class="btn btn-danger btn-sm" onclick="removeItem(${index})">Remover</button></td>
-        `;
-        totalAmount += item.total;
-    });
-
-    totalAmountElement.textContent = `MZN ${totalAmount.toFixed(2)}`;
-}
-
-function removeItem(index) {
-    saleItems.splice(index, 1);
-    updateSaleItemsTable();
-}
-
-document.getElementById('finalizeSaleButton').addEventListener('click', function() {
-    if (saleItems.length === 0) {
-        alert('Por favor, adicione itens à venda antes de finalizar.');
-        return;
-    }
-
-    const paymentMethod = document.getElementById('paymentMethod').value;
-
-    fetch('gerir_vendas/process_sale.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                items: saleItems,
-                paymentMethod: paymentMethod
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Venda realizada com sucesso!');
-                // Abrir o recibo em uma nova janela
-                window.open(data.receiptUrl, '_blank');
-                // Fechar o modal e limpar os itens
-                $('#newSaleModal').modal('hide');
-                saleItems = [];
-                updateSaleItemsTable();
-                // Recarregar a página para atualizar o histórico de vendas
-                location.reload();
-            } else {
-                alert('Erro ao realizar a venda: ' + data.message);
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            alert('Erro ao processar a venda.');
-        });
-});
-
-function viewSaleDetails(saleId) {
-    window.location.href = 'sale_details.php?id=' + saleId;
-}
-
-function printReceipt(saleId) {
-    window.open('print_receipt.php?id=' + saleId, /*'_blank'*/ );
-}
-// Gráfico de Vendas Semanais
-const ctx = document.getElementById('salesChart').getContext('2d');
-const salesChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: <?php echo json_encode($days); ?>,
-        datasets: [{
-            label: 'Vendas Semanais (MZN)',
-            data: <?php echo json_encode($sales_values); ?>,
-            borderColor: '#007bff',
-            backgroundColor: 'rgba(0, 123, 255, 0.2)',
-            borderWidth: 2,
-            fill: true,
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: true,
-                position: 'top'
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-});
-</script>
 <?php include '../includes/footer.php'; ?>

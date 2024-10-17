@@ -1,9 +1,8 @@
 <?php
 require_once '../config/config.php';
-
 require_login();
 
-$orders = get_all_orders();
+$orders = order_get_all();
 
 include '../includes/header.php';
 ?>
@@ -13,6 +12,25 @@ include '../includes/header.php';
     <div class="card">
       <div class="card-body">
         <h4 class="card-title">Pedidos</h4>
+        
+        <?php if (isset($_SESSION['success_message'])): ?>
+          <div class="alert alert-success" role="alert">
+            <?php 
+            echo $_SESSION['success_message']; 
+            unset($_SESSION['success_message']);
+            ?>
+          </div>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['error_message'])): ?>
+          <div class="alert alert-danger" role="alert">
+            <?php 
+            echo $_SESSION['error_message']; 
+            unset($_SESSION['error_message']);
+            ?>
+          </div>
+        <?php endif; ?>
+
         <div class="table-responsive">
           <table class="table table-hover">
             <thead>
@@ -30,7 +48,7 @@ include '../includes/header.php';
               <tr>
                 <td><?php echo $order['id']; ?></td>
                 <td><?php echo $order['table_number']; ?></td>
-                <td>R$ <?php echo number_format($order['total_amount'], 2, ',', '.'); ?></td>
+                <td>MZN <?php echo number_format($order['total_amount'], 2, ',', '.'); ?></td>
                 <td>
                   <span class="badge <?php echo $order['status'] == 'completed' ? 'bg-success' : 'bg-warning'; ?>">
                     <?php echo $order['status'] == 'completed' ? 'Concluído' : 'Ativo'; ?>
@@ -41,6 +59,7 @@ include '../includes/header.php';
                   <a href="view_order.php?id=<?php echo $order['id']; ?>" class="btn btn-info btn-sm">Ver</a>
                   <?php if ($order['status'] != 'completed'): ?>
                     <a href="edit_order.php?id=<?php echo $order['id']; ?>" class="btn btn-warning btn-sm">Editar</a>
+                    <a href="gerir_pedidos/complete_order.php?id=<?php echo $order['id']; ?>" class="btn btn-success btn-sm" onclick="return confirm('Tem certeza que deseja finalizar este pedido e gerar uma venda?')">Finalizar</a>
                   <?php endif; ?>
                 </td>
               </tr>

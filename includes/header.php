@@ -57,14 +57,97 @@ try {
     <link rel="stylesheet" href="../public/assets/css/vertical-layout-light/style.css">
     <link rel="shortcut icon" href="../public/assets/images/favicon.png" />
     <!-- Custom CSS -->
-    <!--<link rel="stylesheet" href="../public/css/style.css">-->
+    <!--<link rel="stylesheet" href="../public/css/sb-admin-2.css">-->
+    <!--<link rel="stylesheet" href="../public/css/sb-admin-2.min.css">-->
+    <style>
+    /* Estilo geral do dashboard */
+    /* Estilo geral do dashboard */
+    body,
+    .main-panel,
+    .content-wrapper {
+        background-color: #1C1C1C;
+        /* Fundo fallback para caso a imagem não carregue */
+        color: #F5F5F5;
+    }
+
+    /* Estilizando o background com o pseudo-elemento */
+    body::before,
+    .main-panel::before,
+    .content-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('../public/assets/images/restaurant-bg.jpg');
+        /* Adicione o caminho da imagem aqui */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.5;
+        /* Transparência para que o conteúdo da frente seja visível */
+        z-index: -1;
+        /* Coloca a imagem atrás do conteúdo */
+    }
+
+    /* Ajustes adicionais para layout */
+    body,
+    .main-panel,
+    .content-wrapper {
+        z-index: 1;
+        /* Coloca o conteúdo em cima do fundo */
+        position: relative;
+        background: rgba(255, 255, 255, 0.5);
+        /* Fundo semi-transparente */
+    }
+
+    /* Cartões */
+    .card {
+        border-radius: 0.5rem;
+        background: rgba(255, 255, 255, 0.9);
+        /* Fundo branco com transparência */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Estilo da tabela */
+    .table {
+        background: rgba(255, 255, 255, 0.8);
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(200, 200, 200, 0.3);
+        /* Cor ao passar o mouse */
+    }
+
+    /* Cartões coloridos 
+    .card-stat {
+        border-radius: 0.5rem;
+        padding: 2rem;
+        margin: 1rem;
+    }*/
+
+    /* Estilos para estatísticas */
+    .bg-primary {
+        background-color: #007bff !important;
+        color: #fff;
+    }
+
+    .bg-success {
+        background-color: #28a745 !important;
+    }
+
+    .bg-danger {
+        background-color: #dc3545 !important;
+    }
+    </style>
 </head>
 
 <body>
     <div class="container-scroller">
         <!-- partial:partials/_navbar.html -->
         <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row"
-            style="border-bottom:1px green solid">
+            style="border-bottom:1px orange solid">
             <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
                 <div class="me-3">
                     <button class="navbar-toggler navbar-toggler align-self-center" type="button"
@@ -110,10 +193,10 @@ try {
             </div>
         </nav>
         <!-- partial -->
-
         <div class="container-fluid page-body-wrapper">
             <!-- partial:partials/_sidebar.html -->
-            <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <nav class="sidebar sidebar-offcanvas" id="sidebar" style="border-left: orange 1px solid !important;">
+                <br>
                 <ul class="nav">
                     <li class="nav-item">
                         <a class="nav-link" href="dashboard.php">

@@ -1,5 +1,7 @@
 <?php
 // Funções de Autenticação e Sessão
+// Funções de Autenticação e Sessão
+
 function is_logged_in() {
     return isset($_SESSION['user_id']);
 }
@@ -7,15 +9,18 @@ function is_logged_in() {
 function login($username, $password) {
     global $pdo;
     
+    // Sanitiza os inputs
     $username = filter_var($username, FILTER_SANITIZE_STRING);
     
+    // Busca o usuário no banco de dados
     $stmt = $pdo->prepare("SELECT id, password, role FROM users WHERE username = ?");
     $stmt->execute([$username]);
     $user = $stmt->fetch();
     
+    // Verifica se a senha corresponde
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
-        $_SESSION['role'] = $user['role']; // Adiciona o papel do usuário na sessão
+        $_SESSION['role'] = $user['role'];
         return true;
     }
     
@@ -31,7 +36,7 @@ function require_login() {
     if (!is_logged_in()) {
         header('Location: ../index.php');
         exit;
-    }
+    }  
 }
 
 function require_admin() {
