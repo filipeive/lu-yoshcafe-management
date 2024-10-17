@@ -93,7 +93,7 @@ include '../includes/header.php';
                                     <?php elseif ($table['real_status'] == 'ocupada'): ?>
                                     <a href="create_order.php?table_id=<?php echo $table['id']; ?>"
                                         class="btn btn-success btn-sm">Criar Pedido</a>
-                                    <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal"
+                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
                                         data-target="#freeTableModal" data-table-id="<?php echo $table['id']; ?>">
                                         Liberar Mesa
                                     </button>

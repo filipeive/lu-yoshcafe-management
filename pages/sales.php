@@ -27,8 +27,8 @@ $products = get_all_products();
             <div class="card-body">
                 <h4 class="card-title">Vendas</h4>
                 <p class="card-description">
-                    <button type="button" class="btn btn-primary mt-2 mt-xl-0" data-bs-toggle="modal"
-                        data-bs-target="#newSaleModal">
+                    <button type="button" class="btn btn-success mt-2 mt-xl-0" data-bs-toggle="modal"
+                        data-bs-target="#newSaleModal" style="padding:20px;">
                         Nova Venda
                     </button>
                 </p>
@@ -64,9 +64,6 @@ $products = get_all_products();
                                                     <button class="btn btn-outline-info btn-sm"
                                                         onclick="printReceipt(<?php echo $sale['id']; ?>)">Imprimir
                                                         Recibo</button>
-                                                    <button class="btn btn-outline-danger btn-sm"
-                                                        onclick="delete_order(<?php echo $sale['id']; ?>)">Cancelar
-                                                    </button>
                                                 </td>
                                             </tr>
                                             <?php endforeach; ?>
@@ -104,9 +101,9 @@ $products = get_all_products();
                     <h5 class="modal-title" id="newSaleModalLabel">Nova Venda</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body mb-8">
                     <form id="newSaleForm">
-                        <div class="row mb-3">
+                        <div class="row mb-8">
                             <div class="col-md-6">
                                 <label for="product" class="form-label">Produto</label>
                                 <select class="form-select" id="product" required>
@@ -125,14 +122,19 @@ $products = get_all_products();
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">&nbsp;</label>
-                                <button type="button" class="btn btn-primary form-control"
-                                    id="addItemButton">Adicionar</button>
+                                <button type="button" class="btn btn-success form-control" id="addItemButton"
+                                    style="padding: 10px;">Adicionar</button>
                             </div>
                         </div>
                     </form>
-                    <table class="table" id="saleItemsTable">
+                    <table class="table-responsive" id="saleItemsTable">
                         <thead>
                             <tr>
+                                <style>
+                                th {
+                                    padding: 10px;
+                                }
+                                </style>
                                 <th>Produto</th>
                                 <th>Quantidade</th>
                                 <th>Preço Unitário</th>
