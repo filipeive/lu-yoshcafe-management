@@ -1,220 +1,263 @@
 <?php
+// No início do seu arquivo PHP, adicione:
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+
+if (isset($_GET['success'])) {
+    echo '<div class="alert alert-success">' . htmlspecialchars($_GET['success']) . '</div>';
+}
+
+if (isset($_GET['error'])) {
+    echo '<div class="alert alert-danger">' . htmlspecialchars($_GET['error']) . '</div>';
+}
 
 require_once '../config/config.php';
 
-// Verifica se o método de requisição é POST
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if ($_POST['action'] == 'create') {
-        $number = $_POST['number'];
-        $capacity = $_POST['capacity'];
-        $status = 'free'; // O status inicial será "livre"
-        
-        // Chama a função para criar uma nova mesa no banco de dados
-        create_table($number, $capacity, $status);
-    } elseif ($_POST['action'] == 'occupy') {
-        $table_id = $_POST['table_id'];
-        update_table_status($table_id, 'occupied');
-    } elseif ($_POST['action'] == 'free') {
-        $table_id = $_POST['table_id'];
-        update_table_status($table_id, 'free');
+// Função para lidar com erros e retornar respostas JSON
+function handleError($message) {
+    error_log($message);
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        echo json_encode(['success' => false, 'message' => $message]);
+        exit;
+    } else {
+        header("Location: tables.php?error=" . urlencode($message));
+        exit;
     }
 }
+if ($result['success']) {
+    header("Location: tables.php?success=" . urlencode($result['message']));
+    exit;
+}
 
-// Função para criar uma nova mesa no banco de dados
-function create_table($number, $capacity, $status) {
-    global $pdo;
 
-    $stmt = $pdo->prepare("INSERT INTO tables (number, capacity, status) VALUES (?, ?, ?)");
-    $stmt->execute([$number, $capacity, $status]);
+// Verifica se o método de requisição é POST
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $action = $_POST['action'] ?? '';
 
-    if ($stmt) {
-        error_log("Nova mesa criada com sucesso: Número $number, Capacidade $capacity");
-    } else {
-        error_log("Erro ao criar nova mesa.");
+    switch ($action) {
+        case 'create':
+            // Código para criar mesa
+            break;
+
+        case 'occupy':
+            $table_id = $_POST['table_id'] ?? '';
+            if (!$table_id) {
+                handleError("ID da mesa é obrigatório.");
+            }
+            $result = update_table_status($table_id, 'occupied');
+            echo json_encode(['success' => true, 'message' => "Table ID $table_id status updated to 'occupied'."]);
+            exit;
+
+        case 'free':
+            $table_id = $_POST['table_id'] ?? '';
+            if (!$table_id) {
+                handleError("ID da mesa é obrigatório.");
+            }
+            $result = update_table_status($table_id, 'free');
+            echo json_encode(['success' => true, 'message' => "Table ID $table_id status updated to 'free'."]);
+            exit;
+
+        // Adicione outros casos conforme necessário...
+
+        default:
+            handleError("Ação inválida.");
     }
 }
 
 // Verifica se o usuário está logado
 require_login();
 
+// A partir daqui, só renderize a página HTML para requisições GET
 $tables = get_all_tables();
 
 include '../includes/header.php';
 ?>
 
+
 <div class="row">
     <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Mesas</h4>
+                <h4 class="my-4 card-title">Mesas</h4>
                 <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#createTableModal">
                     Adicionar Nova Mesa
                 </button>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Número</th>
-                                <th>Capacidade</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($tables as $table): ?>
-                            <tr>
-                                <td><?php echo $table['number']; ?></td>
-                                <td><?php echo $table['capacity']; ?></td>
-                                <td>
-                                    <?php
-                                switch ($table['real_status']) {
-                                    case 'livre':
-                                        echo '<span class="badge bg-success">Livre</span>';
-                                        break;
-                                    case 'ocupada':
-                                        echo '<span class="badge bg-warning">Ocupada</span>';
-                                        break;
-                                    case 'com_pedido':
-                                        echo '<span class="badge bg-danger">Com Pedido</span>';
-                                        break;
-                                }
-                                ?>
-                                </td>
-                                <td>
+                <div class="row">
+                    <?php foreach ($tables as $table): ?>
+                    <div class="col-md-4 mb-4">
+                        <div
+                            class="card text-center <?php echo $table['real_status'] == 'livre' ? 'bg-light' : ($table['real_status'] == 'ocupada' ? 'bg-warning' : 'bg-danger'); ?>">
+                            <div class="card-body">
+                                <h5 class="card-title">Mesa <?php echo $table['number']; ?></h5>
+                                <?php if ($table['group_id']): ?>
+                                <span class="badge bg-info">Unida</span>
+                                <button type="button" class="btn btn-danger btn-sm split-table"
+                                    data-table-id="<?php echo $table['id']; ?>">
+                                    Separar Mesa
+                                </button>
+                                <?php endif; ?>
+                                <p class="card-text">Capacidade: <?php echo $table['capacity']; ?></p>
+                                <p
+                                    class="badge <?php echo $table['real_status'] == 'livre' ? 'bg-success' : ($table['real_status'] == 'ocupada' ? 'bg-warning' : 'bg-danger'); ?>">
+                                    <?php echo ucfirst($table['real_status']); ?>
+                                </p>
+
+                                <div class="d-flex justify-content-around">
                                     <?php if ($table['real_status'] == 'livre'): ?>
-                                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
-                                        data-target="#occupyTableModal" data-table-id="<?php echo $table['id']; ?>">
+                                    <button type="button" class="btn btn-primary btn-sm occupy-table"
+                                        data-table-id="<?php echo $table['id']; ?>">
                                         Ocupar Mesa
                                     </button>
+                                    <button type="button" class="btn btn-warning btn-sm merge-table"
+                                        data-table-id="<?php echo $table['id']; ?>">
+                                        Unir Mesas
+                                    </button>
                                     <?php elseif ($table['real_status'] == 'ocupada'): ?>
+                                    <?php if ($table['real_status'] == 'ocupada' || $table['group_id']): ?>
                                     <a href="create_order.php?table_id=<?php echo $table['id']; ?>"
-                                        class="btn btn-success btn-sm">Criar Pedido</a>
-                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
-                                        data-target="#freeTableModal" data-table-id="<?php echo $table['id']; ?>">
+                                        class="btn btn-success btn-sm">
+                                        Criar Pedido
+                                    </a>
+                                    <?php endif; ?>
+                                    <button type="button" class="btn btn-danger btn-sm free-table"
+                                        data-table-id="<?php echo $table['id']; ?>">
                                         Liberar Mesa
                                     </button>
-                                    <?php else: ?>
-                                    <a href="edit_order.php?table_id=<?php echo $table['id']; ?>"
-                                        class="btn btn-info btn-sm">Ver Pedido</a>
                                     <?php endif; ?>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal para criar mesa -->
-<div class="modal fade" id="createTableModal" tabindex="-1" role="dialog" aria-labelledby="createTableModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createTableModalLabel">Criar Nova Mesa</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="post" action="">
-                <div class="modal-body">
-                    <input type="hidden" name="action" value="create">
-                    <div class="form-group">
-                        <label for="number">Número da Mesa</label>
-                        <input type="number" class="form-control" id="number" name="number" required min="1">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="capacity">Capacidade</label>
-                        <input type="number" class="form-control" id="capacity" name="capacity" required min="1">
-                    </div>
-                    <!-- O status será inicializado como 'livre' -->
-                    <input type="hidden" name="status" value="free">
+                    <?php endforeach; ?>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="submit" class="btn btn-primary">Criar Mesa</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal para ocupar mesa -->
-<div class="modal fade" id="occupyTableModal" tabindex="-1" role="dialog" aria-labelledby="occupyTableModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="occupyTableModalLabel">Ocupar Mesa</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
             </div>
-            <form method="post">
-                <div class="modal-body">
-                    <input type="hidden" name="action" value="occupy">
-                    <input type="hidden" name="table_id" id="occupyTableId">
-                    <p>Tem certeza que deseja ocupar esta mesa?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Ocupar</button>
-                </div>
-            </form>
         </div>
     </div>
 </div>
-
-<!-- Modal para liberar mesa -->
-<div class="modal fade" id="freeTableModal" tabindex="-1" role="dialog" aria-labelledby="freeTableModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="freeTableModalLabel">Liberar Mesa</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="post">
-                <div class="modal-body">
-                    <input type="hidden" name="action" value="free">
-                    <input type="hidden" name="table_id" id="freeTableId">
-                    <p>Tem certeza que deseja liberar esta mesa?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Liberar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<?php include "modais/modais_mesas.php" ?>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
-$('#occupyTableModal').on('show.bs.modal', function(event) {
-    var button = $(event.relatedTarget);
-    var tableId = button.data('table-id');
-    var modal = $(this);
-    modal.find('#occupyTableId').val(tableId);
-});
+$(document).ready(function() {
+    /// Função para ocupar mesa
+    $(document).on('click', '.occupy-table', function() {
+        var tableId = $(this).data('table-id');
+        $('#occupyTableId').val(tableId);
+        $('#occupyTableModal').modal('show');
+    });
 
-$('#freeTableModal').on('show.bs.modal', function(event) {
-    var button = $(event.relatedTarget);
-    var tableId = button.data('table-id');
-    var modal = $(this);
-    modal.find('#freeTableId').val(tableId);
+    // Quando o formulário de ocupação da mesa é enviado
+    $('#occupyTableForm').on('submit', function(e) {
+        e.preventDefault();
+        var tableId = $('#occupyTableId').val();
+
+        $.post('table_management.php', {
+            action: 'occupy',
+            table_id: tableId
+        }, function(response) {
+            if (response.success) {
+                // Atualize o status da mesa na interface
+                $('#table-status-' + tableId).text('ocupada').removeClass('bg-light').addClass(
+                    'bg-warning');
+                showOccupyTableAlert();
+            } else {
+                Swal.fire({
+                    title: 'Erro',
+                    text: response.message,
+                    icon: 'error'
+                });
+            }
+        });
+
+        $('#occupyTableModal').modal('hide');
+    });
+
+    // For free table modal
+    $(document).on('click', '.free-table', function() {
+        var tableId = $(this).data('table-id');
+        $('#freeTableId').val(tableId);
+        $('#freeTableModal').modal('show');
+        $('#freeTableModal').on('hidden.bs.modal', function() {
+            $('#freeTableId').val('');
+        });
+    });
+
+    // SweetAlert para criação de mesa
+    function showCreateTableAlert() {
+        Swal.fire({
+            title: 'Mesa criada com sucesso!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    // SweetAlert para ocupação de mesa
+    function showOccupyTableAlert() {
+        Swal.fire({
+            title: 'Mesa ocupada!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    // SweetAlert para liberação de mesa
+    function showFreeTableAlert() {
+        Swal.fire({
+            title: 'Mesa liberada!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    }
+    // Funções para interceptar o envio de formulários
+    $(document).ready(function() {
+        $('#createTableForm').on('submit', function(e) {
+            e.preventDefault();
+            // Adiciona lógica para criar a mesa...
+            showCreateTableAlert();
+        });
+
+        $('#occupyTableForm').on('submit', function(e) {
+            e.preventDefault();
+            // Adiciona lógica para ocupar a mesa...
+            showOccupyTableAlert();
+        });
+
+        $('#freeTableForm').on('submit', function(e) {
+            e.preventDefault();
+            // Adiciona lógica para liberar a mesa...
+            showFreeTableAlert();
+        });
+    });
+    // Unir mesas
+    $('.merge-table').click(function() {
+        var tableId = $(this).data('table-id');
+        var tableIds = prompt("Digite os IDs das mesas para unir (separados por vírgula):");
+        if (tableIds) {
+            $.post('table_management.php', {
+                action: 'merge',
+                table_ids: tableIds.split(',')
+            }, function(response) {
+                alert(response.message);
+                if (response.success) {
+                    location.reload();
+                }
+            });
+        }
+    });
+
+    // Separar mesa
+    $('.split-table').click(function() {
+        var tableId = $(this).data('table-id');
+        $.post('table_management.php', {
+            action: 'split',
+            table_id: tableId
+        }, function(response) {
+            alert(response.message);
+            if (response.success) {
+                location.reload();
+            }
+        });
+    });
 });
 </script>
-
 <?php include '../includes/footer.php'; ?>

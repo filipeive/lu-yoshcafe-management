@@ -1,6 +1,5 @@
 <?php
 require_once '../config/config.php';
-//require_once '../functions/menu_functions.php';
 require_login();
 require_admin();
 
@@ -38,6 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 // Obter todos os itens do menu
 $menuItems = get_all_menu_items();
 
+// Organizar itens por categoria
+$menuByCategory = [];
+foreach ($menuItems as $item) {
+    $menuByCategory[$item['category']][] = $item;
+}
+
 include '../includes/header.php';
 ?>
 
@@ -46,62 +51,68 @@ include '../includes/header.php';
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title">Gestão de Menus</h4>
-                <p class="card-description">
-                    Adicione, edite ou remova itens do menu
-                </p>
-                <?php
-                        if (isset($_SESSION['success_message'])) {
-                            echo '<div class="alert alert-success">' . $_SESSION['success_message'] . '</div>';
-                            unset($_SESSION['success_message']);
-                        }
-                        if (isset($_SESSION['error_message'])) {
-                            echo '<div class="alert alert-danger">' . $_SESSION['error_message'] . '</div>';
-                            unset($_SESSION['error_message']);
-                        }
-                        ?>
-                <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal"
-                    data-bs-target="#addMenuItemModal">
-                    Adicionar Novo Item
-                </button>
-                <!-- Adicione este botão logo após o botão "Adicionar Novo Item" -->
-                <button type="button" class="btn btn-secondary mb-3 ms-2"
-                    onclick="window.open('gerir_menus/print_menu.php', '_blank')">
-                    Imprimir Menu
-                </button>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Imagem</th>
-                                <th>Nome</th>
-                                <th>Descrição</th>
-                                <th>Preço</th>
-                                <th>Categoria</th>
-                                <th>Ativo</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($menuItems as $item): ?>
-                            <tr>
-                                <td><img src="<?php echo htmlspecialchars($item['image_path']); ?>"
-                                        alt="<?php echo htmlspecialchars($item['name']); ?>"
-                                        style="width: 50px; height: 50px; object-fit: cover;"></td>
-                                <td><?php echo htmlspecialchars($item['name']); ?></td>
-                                <td><?php echo htmlspecialchars($item['description']); ?></td>
-                                <td>MZN <?php echo number_format($item['price'], 2); ?></td>
-                                <td><?php echo htmlspecialchars($item['category']); ?></td>
-                                <td><?php echo $item['is_active'] ? 'Sim' : 'Não'; ?></td>
-                                <td>
-                                    <button class="btn btn-sm btn-info"
-                                        onclick="editMenuItem(<?php echo $item['id']; ?>)">Editar</button>
-                                    <button class="btn btn-sm btn-danger"
-                                        onclick="deleteMenuItem(<?php echo $item['id']; ?>)">Excluir</button>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                <p class="card-description">Adicione, edite ou remova itens do menu</p>
+                <?php if (isset($_SESSION['success_message'])): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <?php echo $_SESSION['success_message']; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <?php unset($_SESSION['success_message']); endif; ?>
+                <?php if (isset($_SESSION['error_message'])): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?php echo $_SESSION['error_message']; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <?php unset($_SESSION['error_message']); endif; ?>
+
+                <div class="d-flex mb-3">
+                    <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
+                        data-bs-target="#addMenuItemModal">
+                        Adicionar Novo Item
+                    </button>
+                    <button type="button" class="btn btn-secondary"
+                        onclick="window.open('gerir_menus/print_menu.php', '_blank')">
+                        Imprimir Menu
+                    </button>
+                </div>
+
+                <div class="row">
+                    <?php foreach ($menuByCategory as $category => $items): ?>
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><?php echo htmlspecialchars($category); ?></h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group">
+                                    <?php foreach ($items as $item): ?>
+                                    <div class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center">
+                                                <img src="<?php echo htmlspecialchars($item['image_path']); ?>"
+                                                    alt="<?php echo htmlspecialchars($item['name']); ?>"
+                                                    style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; margin-right: 10px;">
+                                                <div>
+                                                    <h6><?php echo htmlspecialchars($item['name']); ?></h6>
+                                                    <p class="mb-0">
+                                                        <?php echo htmlspecialchars($item['description']); ?></p>
+                                                    <small>MZN <?php echo number_format($item['price'], 2); ?></small>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <button class="btn btn-sm btn-info"
+                                                    onclick="editMenuItem(<?php echo $item['id']; ?>)">Editar</button>
+                                                <button class="btn btn-sm btn-danger"
+                                                    onclick="deleteMenuItem(<?php echo $item['id']; ?>)">Excluir</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>

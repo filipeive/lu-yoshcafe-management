@@ -1,5 +1,5 @@
 <?php
-require_once '../config/config.php';
+require_once '../../config/config.php';
 require_login();
 
 if (!isset($_GET['id'])) {

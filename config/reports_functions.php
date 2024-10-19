@@ -1,5 +1,4 @@
 <?php
-// Funções de Relatórios
 
 function get_total_sales() {
     global $pdo;
@@ -56,6 +55,7 @@ function get_category_sales() {
     $categories = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
     return $categories ?: []; // Retorna um array vazio se não houver vendas
 }
+
 // Função para obter vendas semanais
 function get_weekly_sales() {
     global $pdo;

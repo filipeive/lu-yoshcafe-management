@@ -121,3 +121,62 @@ function add_item_to_order($order_id, $product_id, $quantity) {
     $stmt->execute([$total_amount, $order_id]);
 }
 
+
+// Função para contar o total de produtos
+function count_filtered_products($categoryFilter, $searchTerm) {
+    global $pdo;
+    $query = "SELECT COUNT(*) FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE 1=1";
+
+    if ($categoryFilter) {
+        $query .= " AND c.id = :category_id";
+    }
+
+    if ($searchTerm) {
+        $query .= " AND p.name LIKE :search";
+    }
+
+    $stmt = $pdo->prepare($query);
+    
+    if ($categoryFilter) {
+        $stmt->bindValue(':category_id', $categoryFilter, PDO::PARAM_INT);
+    }
+
+    if ($searchTerm) {
+        $stmt->bindValue(':search', '%' . $searchTerm . '%', PDO::PARAM_STR);
+    }
+
+    $stmt->execute();
+    return $stmt->fetchColumn();
+}
+
+// Função para buscar produtos com filtros e paginação
+function get_filtered_products($categoryFilter, $searchTerm, $limit, $offset) {
+    global $pdo;
+    $query = "SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE 1=1";
+
+    if ($categoryFilter) {
+        $query .= " AND c.id = :category_id";
+    }
+
+    if ($searchTerm) {
+        $query .= " AND p.name LIKE :search";
+    }
+
+    $query .= " ORDER BY p.name LIMIT :limit OFFSET :offset";
+
+    $stmt = $pdo->prepare($query);
+    
+    if ($categoryFilter) {
+        $stmt->bindValue(':category_id', $categoryFilter, PDO::PARAM_INT);
+    }
+
+    if ($searchTerm) {
+        $stmt->bindValue(':search', '%' . $searchTerm . '%', PDO::PARAM_STR);
+    }
+
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll();
+}
