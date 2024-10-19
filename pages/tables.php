@@ -1,5 +1,4 @@
 <?php
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -22,6 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $table_id = $_POST['table_id'];
         update_table_status($table_id, 'free');
     }
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['table_ids'])) {
+    $table_ids = $_POST['table_ids'];
+    merge_tables($table_ids); // Chama a função para unir mesas
 }
 
 // Função para criar uma nova mesa no banco de dados
@@ -50,171 +54,230 @@ include '../includes/header.php';
     <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Mesas</h4>
+                <h4 class="my-4 card-title">Mesas</h4>
                 <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#createTableModal">
                     Adicionar Nova Mesa
                 </button>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Número</th>
-                                <th>Capacidade</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($tables as $table): ?>
-                            <tr>
-                                <td><?php echo $table['number']; ?></td>
-                                <td><?php echo $table['capacity']; ?></td>
-                                <td>
-                                    <?php
-                                switch ($table['real_status']) {
-                                    case 'livre':
-                                        echo '<span class="badge bg-success">Livre</span>';
-                                        break;
-                                    case 'ocupada':
-                                        echo '<span class="badge bg-warning">Ocupada</span>';
-                                        break;
-                                    case 'com_pedido':
-                                        echo '<span class="badge bg-danger">Com Pedido</span>';
-                                        break;
-                                }
-                                ?>
-                                </td>
-                                <td>
+                <div class="row">
+                    <?php foreach ($tables as $table): ?>
+                    <div class="col-md-4 mb-4">
+                        <div
+                            class="card text-center <?php echo $table['real_status'] == 'livre' ? 'bg-light' : ($table['real_status'] == 'ocupada' ? 'bg-warning' : 'bg-danger'); ?>">
+                            <div class="card-body">
+                                <h5 class="card-title">Mesa <?php echo $table['number']; ?></h5>
+                                <?php if ($table['group_id']): ?>
+                                <span class="badge bg-info">Unida</span>
+                                
+                                <?php endif; ?>
+                                <p class="card-text">Capacidade: <?php echo $table['capacity']; ?></p>
+                                <p
+                                    class="badge <?php echo $table['real_status'] == 'livre' ? 'bg-success' : ($table['real_status'] == 'ocupada' ? 'bg-warning' : 'bg-danger'); ?>">
+                                    <?php echo ucfirst($table['real_status']); ?>
+                                </p>
+
+                                <div class="d-flex justify-content-around">
                                     <?php if ($table['real_status'] == 'livre'): ?>
+                                    <!-- Botão para ocupar mesa -->
                                     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
                                         data-target="#occupyTableModal" data-table-id="<?php echo $table['id']; ?>">
                                         Ocupar Mesa
                                     </button>
+
+                                    <!-- Botão para unir mesas, aparece apenas se a mesa estiver livre -->
+                                    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+                                        data-target="#mergeTablesModal" data-table-id="<?php echo $table['id']; ?>">
+                                        Unir Mesas
+                                    </button>
                                     <?php elseif ($table['real_status'] == 'ocupada'): ?>
+                                    <!-- Botão para criar pedido -->
+                                    <?php if ($table['real_status'] == 'ocupada' || $table['group_id']): ?>
                                     <a href="create_order.php?table_id=<?php echo $table['id']; ?>"
-                                        class="btn btn-success btn-sm">Criar Pedido</a>
+                                        class="btn btn-success btn-sm">
+                                        Criar Pedido
+                                    </a>
+                                    <?php endif; ?>
+                                    <!-- Botão para liberar mesa -->
                                     <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
                                         data-target="#freeTableModal" data-table-id="<?php echo $table['id']; ?>">
                                         Liberar Mesa
                                     </button>
-                                    <?php else: ?>
-                                    <a href="edit_order.php?table_id=<?php echo $table['id']; ?>"
-                                        class="btn btn-info btn-sm">Ver Pedido</a>
+
+                                    <?php if ($table['group_id']): ?>
+                                    
                                     <?php endif; ?>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal para criar mesa -->
-<div class="modal fade" id="createTableModal" tabindex="-1" role="dialog" aria-labelledby="createTableModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createTableModalLabel">Criar Nova Mesa</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="post" action="">
-                <div class="modal-body">
-                    <input type="hidden" name="action" value="create">
-                    <div class="form-group">
-                        <label for="number">Número da Mesa</label>
-                        <input type="number" class="form-control" id="number" name="number" required min="1">
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="capacity">Capacidade</label>
-                        <input type="number" class="form-control" id="capacity" name="capacity" required min="1">
-                    </div>
-                    <!-- O status será inicializado como 'livre' -->
-                    <input type="hidden" name="status" value="free">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="submit" class="btn btn-primary">Criar Mesa</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+                    <?php endforeach; ?>
 
-<!-- Modal para ocupar mesa -->
-<div class="modal fade" id="occupyTableModal" tabindex="-1" role="dialog" aria-labelledby="occupyTableModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="occupyTableModalLabel">Ocupar Mesa</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                </div>
             </div>
-            <form method="post">
-                <div class="modal-body">
-                    <input type="hidden" name="action" value="occupy">
-                    <input type="hidden" name="table_id" id="occupyTableId">
-                    <p>Tem certeza que deseja ocupar esta mesa?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Ocupar</button>
-                </div>
-            </form>
         </div>
     </div>
-</div>
 
-<!-- Modal para liberar mesa -->
-<div class="modal fade" id="freeTableModal" tabindex="-1" role="dialog" aria-labelledby="freeTableModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="freeTableModalLabel">Liberar Mesa</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="post">
-                <div class="modal-body">
-                    <input type="hidden" name="action" value="free">
-                    <input type="hidden" name="table_id" id="freeTableId">
-                    <p>Tem certeza que deseja liberar esta mesa?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Liberar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+    <?php include "modais/modais_mesas.php" ?>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-<script>
-$('#occupyTableModal').on('show.bs.modal', function(event) {
-    var button = $(event.relatedTarget);
-    var tableId = button.data('table-id');
-    var modal = $(this);
-    modal.find('#occupyTableId').val(tableId);
+    <script>
+    $('#occupyTableModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var tableId = button.data('table-id');
+        var modal = $(this);
+        modal.find('#occupyTableId').val(tableId);
+    });
+
+    $('#freeTableModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var tableId = button.data('table-id');
+        var modal = $(this);
+        modal.find('#freeTableId').val(tableId);
+    });
+
+    // SweetAlert para criação de mesa
+    function showCreateTableAlert() {
+        Swal.fire({
+            title: 'Mesa criada com sucesso!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    // SweetAlert para ocupação de mesa
+    function showOccupyTableAlert() {
+        Swal.fire({
+            title: 'Mesa ocupada!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    // SweetAlert para liberação de mesa
+    function showFreeTableAlert() {
+        Swal.fire({
+            title: 'Mesa liberada!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    // Funções para interceptar o envio de formulários
+    $(document).ready(function() {
+        $('#createTableForm').on('submit', function(e) {
+            e.preventDefault();
+            // Adiciona lógica para criar a mesa...
+            showCreateTableAlert();
+        });
+
+        $('#occupyTableForm').on('submit', function(e) {
+            e.preventDefault();
+            // Adiciona lógica para ocupar a mesa...
+            showOccupyTableAlert();
+        });
+
+        $('#freeTableForm').on('submit', function(e) {
+            e.preventDefault();
+            // Adiciona lógica para liberar a mesa...
+            showFreeTableAlert();
+        });
+    });
+    // Table merging functionality
+$('#mergeTablesForm').on('submit', function(e) {
+    e.preventDefault();
+    const tableIds = $('input[name="table_ids[]"]:checked').map(function() {
+        return $(this).val();
+    }).get();
+
+    if (tableIds.length < 2) {
+        Swal.fire({
+            title: 'Erro',
+            text: 'Selecione pelo menos duas mesas para unir.',
+            icon: 'error'
+        });
+        return;
+    }
+
+    $.ajax({
+        url: 'table_management.php',
+        method: 'POST',
+        data: {
+            action: 'merge',
+            table_ids: tableIds
+        },
+        success: function(response) {
+            if (response.success) {
+                Swal.fire({
+                    title: 'Sucesso',
+                    text: 'Mesas unidas com sucesso!',
+                    icon: 'success'
+                }).then(() => location.reload());
+            } else {
+                Swal.fire({
+                    title: 'Erro',
+                    text: response.message || 'Erro ao unir mesas',
+                    icon: 'error'
+                });
+            }
+        },
+        error: function() {
+            Swal.fire({
+                title: 'Erro',
+                text: 'Erro na comunicação com o servidor',
+                icon: 'error'
+            });
+        }
+    });
 });
 
-$('#freeTableModal').on('show.bs.modal', function(event) {
-    var button = $(event.relatedTarget);
-    var tableId = button.data('table-id');
-    var modal = $(this);
-    modal.find('#freeTableId').val(tableId);
-});
-</script>
+// Table splitting functionality
+$(document).on('click', '.split-table-btn', function(e) {
+    e.preventDefault();
+    const tableId = $(this).data('table-id');
 
-<?php include '../includes/footer.php'; ?>
+    Swal.fire({
+        title: 'Confirmar separação',
+        text: 'Deseja separar esta mesa do grupo?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sim',
+        cancelButtonText: 'Não'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: 'table_management.php',
+                method: 'POST',
+                data: {
+                    action: 'split',
+                    table_id: tableId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Sucesso',
+                            text: 'Mesa separada com sucesso!',
+                            icon: 'success'
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire({
+                            title: 'Erro',
+                            text: response.message || 'Erro ao separar mesa',
+                            icon: 'error'
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        title: 'Erro',
+                        text: 'Erro na comunicação com o servidor',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    });
+});
+    </script>
+    <?php include '../includes/footer.php'; ?>
