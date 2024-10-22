@@ -5,29 +5,48 @@ require_login();
 
 $table_id = isset($_GET['table_id']) ? intval($_GET['table_id']) : 0;
 
+// Inicializar a variável $table_ids como um array
+$table_ids = [];
+
+// Consultar a mesa principal
+if ($table_id > 0) {
+    // Verificar se a mesa está em um grupo
+    $stmt = $pdo->prepare("SELECT group_id FROM tables WHERE id = ?");
+    $stmt->execute([$table_id]);
+    $group = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($group && $group['group_id']) {
+        // Mesa faz parte de um grupo, pegar todas as mesas unidas
+        $stmt = $pdo->prepare("SELECT id FROM tables WHERE group_id = ?");
+        $stmt->execute([$group['group_id']]);
+        $table_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    } else {
+        // Mesa única
+        $table_ids = [$table_id];
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $table_id = $_POST['table_id'];
     $products = $_POST['products'];
     $quantities = $_POST['quantities'];
-    
-    // Criar o pedido
-    $order_id = order_create($table_id);
 
-    // Adicionar itens ao pedido
-    for ($i = 0; $i < count($products); $i++) {
-        if ($quantities[$i] > 0) {
-            order_add_item($order_id, $products[$i], $quantities[$i]);
+    // Criar o pedido
+    $order_id = order_create($table_ids);
+
+    // Adicionar itens ao pedido para cada mesa unida
+    foreach ($table_ids as $table_id) {
+        for ($i = 0; $i < count($products); $i++) {
+            if ($quantities[$i] > 0) {
+                order_add_item($order_id, $products[$i], $quantities[$i]);
+            }
         }
     }
 
-    // Atualizar o status da mesa
-    update_table_status($table_id, 'free');
-    if ($current_status === 'occupied') {
-        // Não faça nada ou mostre uma mensagem ao usuário
-        echo "A mesa já está ocupada.";
-    } else {
+    // Atualizar o status das mesas
+    foreach ($table_ids as $table_id) {
         update_table_status($table_id, 'occupied');
     }
+
     // Redirecionar para visualizar o pedido
     header("Location: view_order.php?id=$order_id");
     exit;
@@ -38,6 +57,7 @@ $products = product_get_available();
 include '../includes/header.php';
 ?>
 
+<!-- HTML para criar pedidos -->
 <div class="row">
     <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
@@ -46,7 +66,7 @@ include '../includes/header.php';
                 <form method="post">
                     <input type="hidden" name="table_id" value="<?php echo $table_id; ?>">
                     <div class="form-group">
-                        <label>Mesa: <?php echo $table_id; ?></label>
+                        <label>Mesa: <?php echo implode(', ', $table_ids); ?></label>
                     </div>
                     <div class="form-group">
                         <label>Produtos:</label>
