@@ -53,229 +53,13 @@ try {
     <link rel="stylesheet" href="../public/assets/vendors/typicons/typicons.css">
     <link rel="stylesheet" href="../public/assets/vendors/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="../public/assets/vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.css">
     <!-- endinject -->
     <link rel="stylesheet" href="../public/assets/css/vertical-layout-light/style.css">
     <link rel="shortcut icon" href="../public/assets/images/favicon.png" />
     <!-- Custom CSS -->
-    <!--<link rel="stylesheet" href="../public/css/sb-admin-2.css">-->
+    <link rel="stylesheet" href="../public/css/style.css">
     <!--<link rel="stylesheet" href="../public/css/sb-admin-2.min.css">-->
-    <style>
-    /* Estilo geral do dashboard */
-    body,
-    .main-panel,
-    .content-wrapper {
-        background-color: #1C1C1C;
-        /* Fundo fallback para caso a imagem não carregue */
-        color: #F5F5F5;
-    }
-
-    /* Estilizando o background com o pseudo-elemento */
-    body::before,
-    .main-panel::before,
-    .content-wrapper::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url('../public/assets/images/restaurant-bg.jpg');
-        /* Adicione o caminho da imagem aqui */
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        opacity: 0.5;
-        /* Transparência para que o conteúdo da frente seja visível */
-        z-index: -1;
-        /* Coloca a imagem atrás do conteúdo */
-    }
-
-    /* Ajustes adicionais para layout */
-    body,
-    .main-panel,
-    .content-wrapper {
-        /*z-index: 20;
-        /* Coloca o conteúdo em cima do fundo */
-        position: relative;
-        background: rgba(255, 255, 255, 0.1);
-        /* Fundo semi-transparente */
-    }
-
-    /* Cartões*/
-    .card {
-        border-radius: 0.5rem;
-        background: rgba(255, 255, 255, 0.9);
-        /* Fundo branco com transparência */
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        color: #000;
-    }
-
-    .modal,
-    .modal-title {
-        color: #000;
-    }
-
-    /* Estilo da tabela */
-    .table {
-        background: rgba(255, 255, 255, 0.8);
-    }
-
-    .table-hover tbody tr:hover {
-        background-color: rgba(200, 200, 200, 0.3);
-        /* Cor ao passar o mouse */
-    }
-
-    /* Cartões coloridos 
-    .card-stat {
-        border-radius: 0.5rem;
-        padding: 2rem;
-        margin: 1rem;
-    }*/
-
-    /* Estilos para estatísticas */
-    .bg-primary {
-        background-color: #007bff !important;
-        color: #fff;
-    }
-
-    .bg-success {
-        background-color: #28a745 !important;
-    }
-
-    .bg-danger {
-        background-color: #dc3545 !important;
-    }
-
-    /* Navbar */
-    /* Estilo da navbar */
-    .navbar {
-        background-color: #fff;
-        border-bottom: 1px solid orange;
-        color: #F5F5F5;
-        padding: 10px 20px;
-    }
-
-    .navbar .nav-link {
-        color: #F5F5F5;
-        font-size: 16px;
-        margin-right: 10px;
-        font-weight: 500;
-    }
-
-    .navbar .user-dropdown .dropdown-menu {
-        background-color: #fff;
-        color: #F5F5F5;
-        border: none;
-    }
-
-    .navbar .btn-danger {
-        font-size: 14px;
-        font-weight: 600;
-        color: #fff;
-        background-color: #dc3545;
-        border: none;
-        padding: 5px 10px;
-    }
-
-    .navbar .img-xs {
-        width: 30px;
-        height: 30px;
-    }
-
-    .navbar .dropdown-menu .dropdown-header img {
-        width: 100px;
-        height: 100px;
-    }
-
-
-    /* Botão do menu */
-    .navbar-toggler {
-        background-color: rgba(255, 165, 0, 0.7);
-        /* Laranja translúcido */
-        border-radius: 5px;
-        z-index: 1;
-        padding: 10px;
-
-    }
-
-    .icon-menu {
-        color: #fff;
-    }
-
-    .navbar-menu-wrapper {
-        justify-content: space-between;
-        padding: 10px;
-    }
-
-    .user-dropdown img {
-        border: 2px solid #fff;
-    }
-
-    /* Nome do usuário e botão de logout */
-    .user-dropdown p {
-        color: #F5F5F5;
-        font-weight: 600;
-        margin: 0;
-    }
-
-    .dropdown-item {
-        color: #333;
-    }
-
-    .dropdown-item:hover {
-        background-color: rgba(255, 185, 45, 0.2);
-        /* Fundo laranja ao passar o mouse */
-    }
-
-    .dropdown-header img {
-        width: 50px;
-        /* Aumenta o tamanho da imagem do perfil */
-        border: 2px solid #fff;
-    }
-
-    /* Sidebar */
-    .sidebar {
-        /*background-color: rgba(5, 0, 0, 0.5);
-        /* Fundo com transparência */
-        padding: 10px;
-        border-right: 1px solid orange;
-        color: #fff;
-    }
-
-    .nav-item a.nav-link {
-        color: #FFF;
-        /* Altera a cor do texto para branco */
-        display: flex;
-        align-items: center;
-        padding: 12px 20px;
-        transition: background-color 0.3s ease;
-        font-size: 16px;
-        /* Aumenta o tamanho das letras */
-    }
-
-    .nav-item a.nav-link:hover {
-        background-color: rgba(255, 165, 0, 0.3);
-        /* Fundo laranja translúcido ao passar o mouse */
-    }
-
-    .menu-icon {
-        color: orange;
-        margin-right: 15px;
-    }
-
-    .menu-title {
-        font-weight: 600;
-        /* Texto mais visível e mais grosso */
-        font-size: 16px;
-        /* Aumenta o tamanho da fonte */
-    }
-
-    /* Item ativo */
-    .nav-item.active a.nav-link {
-        background-color: rgba(255, 165, 0, 0.4);
-        /* Item ativo com fundo laranja mais forte */
-    }
-    </style>
 </head>
 
 <body>
@@ -302,9 +86,7 @@ try {
             </div>
 
             <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
-                <!-- Nome do usuário exibido -->
-                <span class="nav-link"> Este eh o Sistema de gerenciamen da Lu e Yoshi Catering</span>
-                <span class="nav-link">Olá, <strong><?php echo $usuario['name']; ?></strong> &nbsp; </span>
+
                 <!-- Foto de perfil com dropdown -->
                 <ul class="navbar-nav ms-3">
                     <li class="nav-item d-flex align-items-center">
@@ -317,6 +99,9 @@ try {
                         </a>
                         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
                             <div class="dropdown-header text-center">
+                                <!-- Nome do usuário exibido -->
+                                <span class="nav-link">Olá, <strong><?php echo $usuario['name']; ?></strong> &nbsp;
+                                </span>
                                 <img class="img-md rounded-circle" src="../public/assets/images/faces/face8.svg"
                                     alt="Profile image">
                                 <p class="mb-1 mt-3 font-weight-semibold"><?php echo $usuario['name']; ?></p>
@@ -331,10 +116,10 @@ try {
                     </li>
                 </ul>
 
-                <!-- Botão de logout direto -->
+                <!-- Botão de logout direto 
                 <a class="btn btn-sm btn-danger ms-3" href="../actions/logout.php">
                     <i class="mdi mdi-power"></i> Sair
-                </a>
+                </a>-->
 
                 <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
                     data-bs-toggle="offcanvas">
@@ -407,7 +192,7 @@ try {
                         </a>
                     </li>
                     <?php endif; ?>
-                    
+
                     <?php if ($_SESSION['role'] == 'admin'): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="reports.php">
@@ -429,4 +214,5 @@ try {
             </nav>
             <!-- partial -->
             <div class="main-panel">
+                <br>
                 <div class="content-wrapper">

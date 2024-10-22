@@ -5,17 +5,17 @@ require_login();
 
 $table_id = isset($_GET['table_id']) ? intval($_GET['table_id']) : 0;
 
-// Inicializar a variável $table_ids como um array
-$table_ids = [];
-
-// Consultar a mesa principal
-if ($table_id > 0) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $table_id = $_POST['table_id'];
+    $products = $_POST['products'];
+    $quantities = $_POST['quantities'];
+    
     // Verificar se a mesa está em um grupo
     $stmt = $pdo->prepare("SELECT group_id FROM tables WHERE id = ?");
     $stmt->execute([$table_id]);
     $group = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($group && $group['group_id']) {
+    if ($group['group_id']) {
         // Mesa faz parte de um grupo, pegar todas as mesas unidas
         $stmt = $pdo->prepare("SELECT id FROM tables WHERE group_id = ?");
         $stmt->execute([$group['group_id']]);
@@ -24,11 +24,6 @@ if ($table_id > 0) {
         // Mesa única
         $table_ids = [$table_id];
     }
-}
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $products = $_POST['products'];
-    $quantities = $_POST['quantities'];
 
     // Criar o pedido
     $order_id = order_create($table_ids);

@@ -45,3 +45,16 @@ function require_admin() {
         exit;
     }
 }
+
+
+// Função para verificar se a página é válida
+function check_page($requested_page) {
+    // Array com páginas válidas
+    $valid_pages = ['home', 'tables', 'orders', 'products', 'reports', '404'];
+
+    // Se a página solicitada não for válida, redirecionar para a página 404
+    if (!in_array($requested_page, $valid_pages)) {
+        header("Location: /404.php");
+        exit();
+    }
+}

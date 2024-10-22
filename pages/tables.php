@@ -1,28 +1,35 @@
 <?php
+<<<<<<< HEAD
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+=======
+// No início do seu arquivo PHP, adicione:
+
+if (isset($_GET['success'])) {
+    echo '<div class="alert alert-success">' . htmlspecialchars($_GET['success']) . '</div>';
+}
+
+if (isset($_GET['error'])) {
+    echo '<div class="alert alert-danger">' . htmlspecialchars($_GET['error']) . '</div>';
+}
+>>>>>>> versa1
 
 require_once '../config/config.php';
 
-// Verifica se o método de requisição é POST
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if ($_POST['action'] == 'create') {
-        $number = $_POST['number'];
-        $capacity = $_POST['capacity'];
-        $status = 'free'; // O status inicial será "livre"
-        
-        // Chama a função para criar uma nova mesa no banco de dados
-        create_table($number, $capacity, $status);
-    } elseif ($_POST['action'] == 'occupy') {
-        $table_id = $_POST['table_id'];
-        update_table_status($table_id, 'occupied');
-    } elseif ($_POST['action'] == 'free') {
-        $table_id = $_POST['table_id'];
-        update_table_status($table_id, 'free');
+// Função para lidar com erros e retornar respostas JSON ou redirecionar
+function handleError($message) {
+    error_log($message);
+    if (is_ajax_request()) {
+        echo json_encode(['success' => false, 'message' => $message]);
+        exit;
+    } else {
+        header("Location: tables.php?error=" . urlencode($message));
+        exit;
     }
 }
 
+<<<<<<< HEAD
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['table_ids'])) {
     $table_ids = $_POST['table_ids'];
     merge_tables($table_ids); // Chama a função para unir mesas
@@ -40,15 +47,21 @@ function create_table($number, $capacity, $status) {
     } else {
         error_log("Erro ao criar nova mesa.");
     }
+=======
+// Função para verificar se a requisição é AJAX
+function is_ajax_request() {
+    return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+>>>>>>> versa1
 }
 
 // Verifica se o usuário está logado
 require_login();
-
+// A partir daqui, só renderize a página HTML para requisições GET
 $tables = get_all_tables();
 
 include '../includes/header.php';
 ?>
+
 
 <div class="row">
     <div class="col-lg-12 grid-margin stretch-card">
@@ -67,7 +80,14 @@ include '../includes/header.php';
                                 <h5 class="card-title">Mesa <?php echo $table['number']; ?></h5>
                                 <?php if ($table['group_id']): ?>
                                 <span class="badge bg-info">Unida</span>
+<<<<<<< HEAD
                                 
+=======
+                                <button type="button" class="btn btn-danger btn-sm split-table"
+                                    data-table-id="<?php echo $table['id']; ?>">
+                                    Separar Mesa
+                                </button>
+>>>>>>> versa1
                                 <?php endif; ?>
                                 <p class="card-text">Capacidade: <?php echo $table['capacity']; ?></p>
                                 <p
@@ -77,6 +97,7 @@ include '../includes/header.php';
 
                                 <div class="d-flex justify-content-around">
                                     <?php if ($table['real_status'] == 'livre'): ?>
+<<<<<<< HEAD
                                     <!-- Botão para ocupar mesa -->
                                     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
                                         data-target="#occupyTableModal" data-table-id="<?php echo $table['id']; ?>">
@@ -90,12 +111,24 @@ include '../includes/header.php';
                                     </button>
                                     <?php elseif ($table['real_status'] == 'ocupada'): ?>
                                     <!-- Botão para criar pedido -->
+=======
+                                    <button type="button" class="btn btn-primary btn-sm occupy-table"
+                                        data-table-id="<?php echo $table['id']; ?>">
+                                        Ocupar Mesa
+                                    </button>
+                                    <button type="button" class="btn btn-warning btn-sm merge-table"
+                                        data-table-id="<?php echo $table['id']; ?>">
+                                        Unir Mesas
+                                    </button>
+                                    <?php elseif ($table['real_status'] == 'ocupada'): ?>
+>>>>>>> versa1
                                     <?php if ($table['real_status'] == 'ocupada' || $table['group_id']): ?>
                                     <a href="create_order.php?table_id=<?php echo $table['id']; ?>"
                                         class="btn btn-success btn-sm">
                                         Criar Pedido
                                     </a>
                                     <?php endif; ?>
+<<<<<<< HEAD
                                     <!-- Botão para liberar mesa -->
                                     <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
                                         data-target="#freeTableModal" data-table-id="<?php echo $table['id']; ?>">
@@ -106,16 +139,27 @@ include '../includes/header.php';
                                     
                                     <?php endif; ?>
                                     <?php endif; ?>
+=======
+                                    <button type="button" class="btn btn-danger btn-sm free-table"
+                                        data-table-id="<?php echo $table['id']; ?>">
+                                        Liberar Mesa
+                                    </button>
+                                    <?php endif; ?>
+>>>>>>> versa1
                                 </div>
                             </div>
                         </div>
                     </div>
                     <?php endforeach; ?>
+<<<<<<< HEAD
 
+=======
+>>>>>>> versa1
                 </div>
             </div>
         </div>
     </div>
+<<<<<<< HEAD
 
     <?php include "modais/modais_mesas.php" ?>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -281,3 +325,118 @@ $(document).on('click', '.split-table-btn', function(e) {
 });
     </script>
     <?php include '../includes/footer.php'; ?>
+=======
+</div>
+<?php include "modais/modais_mesas.php" ?>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+$(document).ready(function() {
+
+    // Ocupar mesa via AJAX
+    $(document).on('click', '.occupy-table', function() {
+        var tableId = $(this).data('table-id');
+
+        $.post('table_management.php', {
+            action: 'occupy',
+            table_id: tableId
+        }, function(response) {
+            if (response.success) {
+                Swal.fire('Sucesso', response.message, 'success');
+                // Atualiza o status na interface
+                location.reload();
+            } else {
+                Swal.fire('Erro', response.message, 'error');
+            }
+        }, 'json');
+    });
+
+    // Liberar mesa via AJAX
+    $(document).on('click', '.free-table', function() {
+        var tableId = $(this).data('table-id');
+
+        $.post('table_management.php', {
+            action: 'free',
+            table_id: tableId
+        }, function(response) {
+            if (response.success) {
+                Swal.fire('Sucesso', response.message, 'success');
+                location.reload();
+            } else {
+                Swal.fire('Erro', response.message, 'error');
+            }
+        }, 'json');
+    });
+
+    // Unir mesas via AJAX
+    $(document).on('click', '.merge-table', function() {
+        var tableIds = prompt("Digite os IDs das mesas para unir (separados por vírgula):");
+
+        if (tableIds) {
+            $.post('table_management.php', {
+                action: 'merge',
+                table_ids: tableIds.split(',')
+            }, function(response) {
+                if (response.success) {
+                    Swal.fire('Sucesso', response.message, 'success');
+                    location.reload();
+                } else {
+                    Swal.fire('Erro', response.message, 'error');
+                }
+            }, 'json');
+        }
+    });
+
+    // Separar mesa via AJAX
+    $(document).on('click', '.split-table', function() {
+        var tableId = $(this).data('table-id');
+
+        $.post('table_management.php', {
+            action: 'split',
+            table_id: tableId
+        }, function(response) {
+            if (response.success) {
+                Swal.fire('Sucesso', response.message, 'success');
+                location.reload();
+            } else {
+                Swal.fire('Erro', response.message, 'error');
+            }
+        }, 'json');
+    });
+
+    // Funções para interceptar o envio de formulários
+    $('#createTableForm').on('submit', function(e) {
+        e.preventDefault();
+        // Adiciona lógica para criar a mesa...
+        Swal.fire({
+            title: 'Mesa criada com sucesso!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    });
+
+    $('#occupyTableForm').on('submit', function(e) {
+        e.preventDefault();
+        // Adiciona lógica para ocupar a mesa...
+        Swal.fire({
+            title: 'Mesa ocupada!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    });
+
+    $('#freeTableForm').on('submit', function(e) {
+        e.preventDefault();
+        // Adiciona lógica para liberar a mesa...
+        Swal.fire({
+            title: 'Mesa liberada!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    });
+});
+</script>
+
+<?php include '../includes/footer.php'; ?>
+>>>>>>> versa1

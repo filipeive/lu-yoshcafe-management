@@ -6,9 +6,12 @@ require_login();
 $total_sales = get_total_sales();
 $total_orders = get_total_orders();
 $total_clients = get_total_clients();
-$monthly_sales = get_monthly_sales(); // Exemplo de função para obter vendas mensais
-$category_sales = get_category_sales(); // Exemplo de função para obter vendas por categoria
+$monthly_sales = get_monthly_sales(); // Função que retorna array de vendas mensais
+$weekly_sales = get_weekly_sales(); // Função que retorna array de vendas semanais
 
+// Prepare os dados para JSON
+$monthly_sales_json = json_encode($monthly_sales);
+$weekly_sales_json = json_encode($weekly_sales);
 include '../includes/header.php';
 ?>
 
@@ -27,7 +30,8 @@ include '../includes/header.php';
                             <div class="card-body">
                                 <i class="mdi mdi-cash-multiple" style="font-size: 2.5rem;"></i>
                                 <h5 class="card-title mt-2">Total de Vendas</h5>
-                                <p class="card-text" style="font-size: 1.5rem;">MZN <?php echo number_format($total_sales, 2, ',', '.'); ?></p>
+                                <p class="card-text" style="font-size: 1.5rem;">MZN
+                                    <?php echo number_format($total_sales, 2, ',', '.'); ?></p>
                             </div>
                         </div>
                     </div>
@@ -60,19 +64,24 @@ include '../includes/header.php';
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">Vendas Mensais</h5>
-                                <canvas id="monthlySalesChart"></canvas>
+                                <div class="chart-container" style="position: relative; height:300px;">
+                                    <canvas id="monthlySalesChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Gráfico de Vendas por Categoria -->
+                    <!-- Sales Chart -->
                     <div class="col-md-6">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title">Vendas por Categoria</h5>
-                                <canvas id="categorySalesChart"></canvas>
+                                <h4 class="card-title">Vendas Semanais</h4>
+                                <div class="chart-container" style="position: relative; height:300px;">
+                                    <canvas id="salesChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- Outros Gráficos ou Relatórios -->
@@ -84,47 +93,75 @@ include '../includes/header.php';
 
 <!-- Footer -->
 <?php include '../includes/footer.php'; ?>
-
-<!-- Bibliotecas de gráficos (Chart.js) -->
+<!-- Adicione antes do script -->
+<input type="hidden" id="monthlySalesData" value='<?php echo $monthly_sales_json; ?>'>
+<input type="hidden" id="weeklySalesData" value='<?php echo $weekly_sales_json; ?>'>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Dados e configuração do gráfico de Vendas Mensais
-var ctx = document.getElementById('monthlySalesChart').getContext('2d');
-var monthlySalesChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: [<?php echo implode(',', array_keys($monthly_sales)); ?>], // Mêses
-        datasets: [{
-            label: 'Vendas (MZN)',
-            data: [<?php echo implode(',', array_values($monthly_sales)); ?>],
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
+document.addEventListener('DOMContentLoaded', function() {
+    // Gráfico Mensal
+    const monthlySalesData = JSON.parse(document.getElementById('monthlySalesData').value);
+    const ctxMonthly = document.getElementById('monthlySalesChart').getContext('2d');
+    new Chart(ctxMonthly, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(monthlySalesData),
+            datasets: [{
+                label: 'Vendas (MZN)',
+                data: Object.values(monthlySalesData),
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
             }
         }
-    }
-});
+    });
 
-// Dados e configuração do gráfico de Vendas por Categoria
-var ctx2 = document.getElementById('categorySalesChart').getContext('2d');
-var categorySalesChart = new Chart(ctx2, {
-    type: 'pie',
-    data: {
-        labels: [<?php echo implode(',', array_keys($category_sales)); ?>], // Categorias
-        datasets: [{
-            label: 'Vendas por Categoria',
-            data: [<?php echo implode(',', array_values($category_sales)); ?>],
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-        }]
-    },
-    options: {
-        responsive: true,
-    }
+    // Gráfico Semanal
+    const weeklySalesData = JSON.parse(document.getElementById('weeklySalesData').value);
+    const ctxWeekly = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctxWeekly, {
+        type: 'line',
+        data: {
+            labels: Object.keys(weeklySalesData),
+            datasets: [{
+                label: 'Vendas (MZN)',
+                data: Object.values(weeklySalesData),
+                borderColor: '#4B49AC',
+                backgroundColor: 'rgba(75, 73, 172, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        borderDash: [2, 2]
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
 });
 </script>

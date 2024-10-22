@@ -1,59 +1,286 @@
-/* Estilos customizados */
-/* Cores quentes */
-:root {
-    --primary-color: #ff6b6b;
-    --secondary-color: #feca57;
-    --accent-color: #ff9ff3;
+/* Estilo geral do dashboard */
+    /*.card {
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .btn-lg {
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 0.5rem;
+    }
+
+    .mdi-36px {
+        font-size: 36px !important;
+    }
+
+    .table-responsive {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .badge {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    body,
+    .main-panel,
+    .content-wrapper {
+        background-color: #1C1C1C;
+        color: #F5F5F5;
+    }
+*/
+    /* Estilizando o background com o pseudo-elemento */
+    body::before,
+    .main-panel::before,
+    .content-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('../assets/images/restaurant-bg.jpg');
+        /* Adicione o caminho da imagem aqui */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.5;
+        /* Transparência para que o conteúdo da frente seja visível */
+        z-index: -1;
+        /* Coloca a imagem atrás do conteúdo */
+    }
+
+    /* Ajustes adicionais para layout */
+    body,
+    .main-panel,
+    .content-wrapper {
+        /*z-index: 20;
+        /* Coloca o conteúdo em cima do fundo */
+        position: relative;
+        background: rgba(255, 255, 255, 0.1);
+        /* Fundo semi-transparente */
+    }
+
+    /* Cartões
+    .card {
+        border-radius: 0.5rem;
+        background: rgba(255, 255, 255, 0.9);
+        /* Fundo branco com transparência 
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        color: #000;
+    }
+
+    .modal,
+    .modal-title {
+        color: #000;
+    }
+    .table {
+        background: rgba(255, 255, 255, 0.8);
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(200, 200, 200, 0.3);
+    }
+
+    .card-stat {
+        border-radius: 0.5rem;
+        padding: 2rem;
+        margin: 1rem;
+    }*/
+
+    /* Estilos para estatísticas */
+    .bg-primary {
+        background-color: #007bff !important;
+        color: #fff;
+    }
+
+    .bg-success {
+        background-color: #28a745 !important;
+    }
+
+    .bg-danger {
+        background-color: #dc3545 !important;
+    }
+
+    /* Navbar */
+    /* Estilos para a Navbar */
+.navbar {
+  background-color: #343a40; /* Cor de fundo da navbar */
+  border-bottom: 2px solid #495057; /* Borda inferior */
+}
+
+.nav-link {
+  color: #ffffff; /* Cor do texto */
+  transition: color 0.3s; /* Transição suave para hover */
+}
+
+.nav-link:hover {
+  color: #ffc107; /* Cor ao passar o mouse */
+}
+
+.navbar-nav .nav-item {
+  margin: 0 15px; /* Espaçamento entre os itens */
+}
+
+.user-dropdown .dropdown-menu {
+  background-color: #495057; /* Cor de fundo do menu dropdown */
+  border: none; /* Remove a borda padrão */
+}
+
+.dropdown-header {
+  background-color: #343a40; /* Cor de fundo do cabeçalho */
+  color: #ffffff; /* Cor do texto do cabeçalho */
+}
+
+.dropdown-item {
+  color: #ffffff; /* Cor do texto dos itens dropdown */
+}
+
+.dropdown-item:hover {
+  background-color: #6c757d; /* Cor ao passar o mouse nos itens dropdown */
+}
+
+.dropdown-item-icon {
+  color: #ffc107; /* Cor dos ícones no dropdown */
+}
+
+/* Estilos para o botão de toggle em telas pequenas */
+.navbar-toggler {
+  background-color: #007bff; /* Cor do botão de toggle */
+  border: none; /* Remove a borda padrão */
+}
+
+    .icon-menu {
+      color: #ff7300;
   }
-  
-  /* Personalização dos botões grandes */
-  .btn-lg {
-    padding: 15px 25px;
-    font-size: 18px;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-  }
-  
-  .btn-lg:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Cores personalizadas para os botões */
-  .btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-  }
-  
-  .btn-success {
-    background-color: var(--secondary-color);
-    border-color: var(--secondary-color);
-  }
-  
-  .btn-info {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
-  }
-  
-  /* Personalização do sidebar */
-  .sidebar {
-    background-color: #fff3e0;
-  }
-  
-  .sidebar .nav-item .nav-link {
-    color: #ff6b6b;
-  }
-  
-  .sidebar .nav-item .nav-link.active {
-    background-color: #ffe0b2;
-  }
-  
-  /* Personalização do navbar */
-  .navbar {
-    background-color: #fff3e0;
-  }
-  
-  /* Personalização do conteúdo principal */
-  .content-wrapper {
-    background-color: #fff9c4;
-  }
+/* Estilos para os botões de ações rápidas */
+.btn-gradient-primary {
+  background: linear-gradient(135deg, #007bff, #0056b3); /* Azul */
+  border: none;
+  color:#fff;
+}
+
+.btn-gradient-primary:hover {
+  background: linear-gradient(135deg, #0056b3, #004085); /* Azul mais escuro */
+  color:#fff;
+
+}
+
+.btn-gradient-success {
+  background: linear-gradient(135deg, #28a745, #218838); /* Verde */
+  border: none;
+  color:#fff;
+
+}
+
+.btn-gradient-success:hover {
+  background: linear-gradient(135deg, #218838, #1e7e34); /* Verde mais escuro */
+  color:#fff;
+
+}
+
+.btn-gradient-info {
+  background: linear-gradient(135deg, #17a2b8, #138496); /* Ciano */
+  border: none;
+  color:#fff;
+
+}
+
+.btn-gradient-info:hover {
+  background: linear-gradient(135deg, #138496, #117a8b); /* Ciano mais escuro */
+  color:#fff;
+
+}
+
+.btn-gradient-warning {
+  background: linear-gradient(135deg, #ffc107, #e0a800); /* Amarelo */
+  border: none;
+  color:#fff;
+
+}
+
+.btn-gradient-warning:hover {
+  background: linear-gradient(135deg, #e0a800, #c69500); /* Amarelo mais escuro */
+  color:#fff;
+
+}
+
+    /* Botão do menu 
+    .navbar-toggler {
+        background-color: rgba(255, 165, 0, 0.7);
+        border-radius: 5px;
+        z-index: 1;
+        padding: 10px;
+
+    }
+
+   
+
+    .navbar-menu-wrapper {
+        justify-content: space-between;
+        padding: 10px;
+    }
+
+    .user-dropdown img {
+        border: 2px solid #fff;
+    }
+
+    .user-dropdown p {
+        color: #F5F5F5;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .dropdown-item {
+        color: #333;
+    }
+
+    .dropdown-item:hover {
+        background-color: rgba(255, 185, 45, 0.2);
+    }
+
+    .dropdown-header img {
+        width: 50px;
+        border: 2px solid #fff;
+    }
+
+    sidebar 
+    .sidebar {
+        padding: 10px;
+        border-right: 1px solid orange;
+        color: #fff;
+    }
+
+    .nav-item a.nav-link {
+        color: #FFF;
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        transition: background-color 0.3s ease;
+        font-size: 16px;
+    }
+
+    .nav-item a.nav-link:hover {
+        background-color: rgba(255, 165, 0, 0.3);
+    }
+
+    .menu-icon {
+        margin-right: 15px;
+    }
+
+    .menu-title {
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .nav-item.active a.nav-link {
+        background-color: rgba(255, 165, 0, 0.4);
+    }
+    */

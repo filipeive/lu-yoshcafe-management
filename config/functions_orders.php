@@ -120,3 +120,16 @@ function sale_get_total_today() {
     $stmt = $pdo->query("SELECT SUM(total_amount) FROM sales WHERE DATE(sale_date) = CURDATE() AND status = 'completed'");
     return $stmt->fetchColumn() ?: 0;
 }
+
+function get_paginated_order($offset, $per_page) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM orders ORDER BY table_id DESC LIMIT :offset, :per_page");
+    
+    // Use bindValue para evitar injeção de SQL
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->bindValue(':per_page', $per_page, PDO::PARAM_INT);
+
+    $stmt->execute();
+    
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}

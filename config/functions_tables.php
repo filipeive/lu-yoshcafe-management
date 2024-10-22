@@ -1,25 +1,57 @@
 <?php
+// Constants for valid statuses
+const VALID_TABLE_STATUSES = ['free', 'occupied'];
 
+/**
+ * Update table information
+ * @param int $id Table ID
+ * @param int $number Table number
+ * @param string $status Table status
+ * @return bool
+ * @throws InvalidArgumentException
+ */
 function update_table($id, $number, $status) {
     global $pdo;
     
-    $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
-    $number = filter_var($number, FILTER_SANITIZE_NUMBER_INT);
+    // Input validation
+    $id = filter_var($id, FILTER_VALIDATE_INT);
+    $number = filter_var($number, FILTER_VALIDATE_INT);
     $status = filter_var($status, FILTER_SANITIZE_STRING);
+    
+    if (!in_array($status, VALID_TABLE_STATUSES)) {
+        throw new InvalidArgumentException("Invalid status. Must be 'free' or 'occupied'.");
+    }
+    
+    if ($id === false || $number === false) {
+        throw new InvalidArgumentException("Invalid ID or table number.");
+    }
     
     $stmt = $pdo->prepare("UPDATE tables SET number = ?, status = ? WHERE id = ?");
     return $stmt->execute([$number, $status, $id]);
 }
+
+/**
+ * Update table status
+ * @param int $table_id
+ * @param string $status
+ * @return array
+ * @throws InvalidArgumentException|Exception
+ */
+
 function update_table_status($table_id, $status) {
     global $pdo;
     
-    // Validate status
-    $valid_statuses = ['free', 'occupied'];
-    if (!in_array($status, $valid_statuses)) {
+    // Input validation
+    $table_id = filter_var($table_id, FILTER_VALIDATE_INT);
+    if ($table_id === false) {
+        throw new InvalidArgumentException("Invalid table ID.");
+    }
+    
+    if (!in_array($status, VALID_TABLE_STATUSES)) {
         throw new InvalidArgumentException("Invalid status. Must be 'free' or 'occupied'.");
     }
     
-    // Verifica o status atual da mesa
+    // Check current table status
     $stmt = $pdo->prepare("SELECT status FROM tables WHERE id = ?");
     $stmt->execute([$table_id]);
     $current_status = $stmt->fetchColumn();
@@ -28,55 +60,70 @@ function update_table_status($table_id, $status) {
         throw new Exception("No table found with ID $table_id.");
     }
     
-    // Se o status atual for o mesmo que o novo status, não faz nada
+    // If status hasn't changed, return early
     if ($current_status === $status) {
-        throw new Exception("The status of table ID $table_id is already '$status'.");
+        return [
+            'success' => true, 
+            'message' => "The status of table ID $table_id is already '$status'."
+        ];
     }
-
+    
+    // Update the status
     $stmt = $pdo->prepare("UPDATE tables SET status = ? WHERE id = ?");
     $stmt->execute([$status, $table_id]);
     
     if ($stmt->rowCount() === 0) {
-        throw new Exception("No table found with ID $table_id or status was not changed.");
+        throw new Exception("Failed to update status for table ID $table_id.");
     }
+    
+    return [
+        'success' => true,
+        'message' => "Table ID $table_id status updated to '$status'."
+    ];
+    //reload the page
+    header("Location: dashboard.php");
+    exit;
 }
 
+/**
+ * Delete a table
+ * @param int $id
+ * @return bool
+ * @throws InvalidArgumentException
+ */
 function delete_table($id) {
     global $pdo;
-    $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
+    
+    $id = filter_var($id, FILTER_VALIDATE_INT);
+    if ($id === false) {
+        throw new InvalidArgumentException("Invalid table ID.");
+    }
+    
     $stmt = $pdo->prepare("DELETE FROM tables WHERE id = ?");
     return $stmt->execute([$id]);
 }
+
+/**
+ * Get all tables with their current status
+ * @return array
+ */
 function get_all_tables() {
     global $pdo;
-    $stmt = $pdo->query("
-        SELECT t.*, 
-               CASE 
-                   WHEN o.id IS NOT NULL THEN 'com_pedido'
-                   WHEN t.status = 'occupied' THEN 'ocupada'
-                   ELSE 'livre'
-               END AS real_status
+    
+    $query = "
+        SELECT 
+            t.*,
+            CASE
+                WHEN o.id IS NOT NULL THEN 'com_pedido'
+                WHEN t.status = 'occupied' THEN 'ocupada'
+                ELSE 'livre'
+            END AS real_status,
+            t.group_id
         FROM tables t
         LEFT JOIN orders o ON t.id = o.table_id AND o.status = 'active'
         ORDER BY t.number
-    ");
-    return $stmt->fetchAll();
-}
-// Funções de Mesas (Tables)
-function table_create($number, $capacity, $status = 'free') {
-    global $pdo;
+    ";
     
-    $number = filter_var($number, FILTER_SANITIZE_NUMBER_INT);
-    $capacity = filter_var($capacity, FILTER_SANITIZE_NUMBER_INT);
-    $status = filter_var($status, FILTER_SANITIZE_STRING);
-    
-    $stmt = $pdo->prepare("INSERT INTO tables (number, capacity, status) VALUES (?, ?, ?)");
-    return $stmt->execute([$number, $capacity, $status]);
-}
-
-function table_get_by_id($table_id) {
-    global $pdo;
-    $stmt = $pdo->prepare("SELECT * FROM tables WHERE id = ?");
-    $stmt->execute([$table_id]);
-    return $stmt->fetch();
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
