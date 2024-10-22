@@ -284,3 +284,8 @@
         background-color: rgba(255, 165, 0, 0.4);
     }
     */
+    .table-card.selected {
+      background-color: #28a745; /* Verde */
+      color: white;
+  }
+  

@@ -26,7 +26,6 @@ include '../includes/header.php';
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title">Gestão de Estoque</h4>
-
                 <div class="mb-3">
                     <form class="d-flex" method="GET" action="">
                         <input type="text" class="form-control me-2" name="search" placeholder="Pesquisar produto"
@@ -49,10 +48,25 @@ include '../includes/header.php';
                     <?php foreach ($products as $product): ?>
                     <div class="col-md-4 mb-4">
                         <div class="card">
+                            <?php if ($product['image_path']): ?>
+                            <img src="<?php echo htmlspecialchars('uploads/products/' . $product['image_path']); ?>"
+                                class="card-img-top" alt="<?php echo htmlspecialchars($product['name']); ?>"
+                                style="height: 200px; object-fit: cover;">
+                            <?php elseif ($product['category_name'] == 'Comida' && isset($product['menu_image'])): ?>
+                            <img src="<?php echo htmlspecialchars('uploads/menus/' . $product['menu_image']); ?>"
+                                class="card-img-top" alt="<?php echo htmlspecialchars($product['name']); ?>"
+                                style="height: 200px; object-fit: cover;">
+                            <?php else: ?>
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                style="height: 200px;">
+                                <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                            </div>
+                            <?php endif; ?>
                             <div class="card-body">
                                 <h5 class="card-title"><?php echo htmlspecialchars($product['name']); ?></h5>
                                 <h6 class="card-subtitle mb-2 text-muted">
-                                    <?php echo htmlspecialchars($product['category_name']); ?></h6>
+                                    <?php echo htmlspecialchars($product['category_name']); ?>
+                                </h6>
                                 <p class="card-text">Preço: MZN
                                     <?php echo number_format($product['price'], 2, ',', '.'); ?></p>
                                 <p class="card-text">Estoque: <?php echo $product['stock_quantity']; ?></p>
@@ -120,6 +134,11 @@ include '../includes/header.php';
                         <label for="product_stock_quantity">Quantidade em Estoque</label>
                         <input type="number" class="form-control" id="product_stock_quantity" name="stock_quantity"
                             required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product_image">Imagem do Produto</label>
+                        <input type="file" class="form-control" id="product_image" name="product_image"
+                            accept="image/*">
                     </div>
                     <div class="form-group">
                         <label for="product_category_id">Categoria</label>

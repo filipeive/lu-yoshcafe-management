@@ -97,16 +97,16 @@
             <form id="mergeTablesForm">
                 <div class="modal-body">
                     <p>Selecione as mesas que deseja unir:</p>
-                    <div class="form-group">
+                    <div class="row">
                         <?php foreach ($tables as $table): ?>
                         <?php if ($table['real_status'] == 'livre' && !$table['group_id']): ?>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="table_ids[]"
-                                value="<?php echo $table['id']; ?>" id="table_<?php echo $table['id']; ?>">
-                            <label class="form-check-label" for="table_<?php echo $table['id']; ?>">
-                                Mesa <?php echo $table['number']; ?>
-                                (Capacidade: <?php echo $table['capacity']; ?>)
-                            </label>
+                        <div class="col-md-4 mb-2">
+                            <div class="card table-card" data-table-id="<?php echo $table['id']; ?>" style="cursor: pointer;">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Mesa <?php echo $table['number']; ?></h5>
+                                    <p class="card-text">Capacidade: <?php echo $table['capacity']; ?></p>
+                                </div>
+                            </div>
                         </div>
                         <?php endif; ?>
                         <?php endforeach; ?>
