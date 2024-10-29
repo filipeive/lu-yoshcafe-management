@@ -71,12 +71,17 @@ include '../includes/header.php';
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h4 class="card-title mb-0">Gestão de Estoque</h4>
-                        <button type="button" class="btn btn-primary btn-icon-text" data-toggle="modal"
+                    <h4 class="card-title mb-0">Gerenciar Produtos</h4><br>
+                    <div class="d-flex justify-content-space-around align-items-center mb-4">
+                        <button type="button" class="btn btn-primary btn-sm btn-icon-text" data-toggle="modal"
                             data-target="#addProductModal">
                             <i class="ti-plus btn-icon-prepend"></i>
                             Adicionar Produto
+                        </button>
+                        <button type="button" class="btn btn-warning btn-sm btn-icon-text" data-toggle="modal"
+                            data-target="#addCategoryModal">
+                            <i class="ti-plus btn-icon-prepend"></i>
+                            Adicionar Nova Categoria
                         </button>
                     </div>
 
