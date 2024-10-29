@@ -251,7 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
-
 // Função para gerar o conteúdo do recibo
 function generateReceiptContent(isPreview = false) {
     const date = new Date().toLocaleString('pt-BR');
@@ -267,15 +266,15 @@ function generateReceiptContent(isPreview = false) {
 
     let content = `
         <!DOCTYPE html>
-        <html>
+        <html lang="pt-BR">
         <head>
             <meta charset="UTF-8">
             <title>${isPreview ? 'Pré-visualização do Recibo' : 'Recibo'}</title>
             <style>
                 body {
-                    font-family: 'Arial', sans-serif;
+                    font-family: 'Courier New', monospace;
                     margin: 0;
-                    padding: 20px;
+                    padding: 10px;
                     font-size: 12px;
                 }
                 .receipt {
@@ -287,36 +286,27 @@ function generateReceiptContent(isPreview = false) {
                     margin-bottom: 20px;
                 }
                 .logo {
-                    max-width: 150px;
+                    max-width: 100px;
                     margin-bottom: 10px;
-                }
-                .company-info {
-                    margin-bottom: 20px;
                 }
                 .divider {
                     border-top: 1px dashed #000;
                     margin: 10px 0;
                 }
-                .items {
-                    margin-bottom: 20px;
+                .items, .totals, .payment-methods, .footer {
+                    margin-top: 15px;
                 }
                 .item {
                     display: flex;
                     justify-content: space-between;
-                    margin-bottom: 5px;
                 }
-                .totals {
-                    margin-top: 10px;
-                    border-top: 1px solid #000;
-                    padding-top: 10px;
-                }
-                .payment-methods {
-                    margin-top: 15px;
+                .totals strong {
+                    font-weight: bold;
                 }
                 .footer {
                     text-align: center;
-                    margin-top: 20px;
                     font-size: 10px;
+                    margin-top: 20px;
                 }
                 @media print {
                     @page {
@@ -324,7 +314,7 @@ function generateReceiptContent(isPreview = false) {
                         size: 80mm 297mm;
                     }
                     body {
-                        margin: 10px;
+                        margin: 0;
                     }
                     .no-print {
                         display: none;
@@ -335,45 +325,40 @@ function generateReceiptContent(isPreview = false) {
         <body>
             <div class="receipt">
                 <div class="header">
-                    <h2>Lu & Yoshi Catering</h2>
+                    <h2>Lu & Yosh Catering</h2>
                     <div class="company-info">
-                        <p>Av. Eduardo Mondlane, 1234</p>
-                        <p>Quelimane, Moçambique</p>
-                        <p>Tel: +258 21 123 456</p>
-                        <p>NUIT: 123456789</p>
+                        <p>Av. Eduardo Mondlane, 1234<br>Quelimane, Moçambique<br>Tel: +258 21 123 456<br>NUIT: 123456789</p>
                     </div>
-                    <div>
-                        <p>Data: ${date}</p>
-                        ${isPreview ? '<h3 style="color: red;">PRÉ-VISUALIZAÇÃO</h3>' : ''}
-                    </div>
+                    <p>Data: ${date}</p>
+                    ${isPreview ? '<h3 style="color: red;">PRÉ-VISUALIZAÇÃO</h3>' : ''}
                 </div>
                 
                 <div class="divider"></div>
                 
                 <div class="items">
                     <table style="width: 100%;">
-                        <tr>
-                            <th style="text-align: left;">Item</th>
-                            <th style="text-align: right;">Qtd</th>
-                            <th style="text-align: right;">Preço</th>
-                            <th style="text-align: right;">Total</th>
-                        </tr>
-                        ${saleItems.map(item => `
+                        <thead>
                             <tr>
-                                <td style="text-align: left;">${item.name}</td>
-                                <td style="text-align: right;">${item.quantity}</td>
-                                <td style="text-align: right;">MZN ${item.price.toFixed(2)}</td>
-                                <td style="text-align: right;">MZN ${item.total.toFixed(2)}</td>
+                                <th style="text-align: left;">Item</th>
+                                <th style="text-align: right;">Qtd</th>
+                                <th style="text-align: right;">Preço</th>
+                                <th style="text-align: right;">Total</th>
                             </tr>
-                        `).join('')}
+                        </thead>
+                        <tbody>
+                            ${saleItems.map(item => `
+                                <tr>
+                                    <td>${item.name}</td>
+                                    <td style="text-align: right;">${item.quantity}</td>
+                                    <td style="text-align: right;">MZN ${item.price.toFixed(2)}</td>
+                                    <td style="text-align: right;">MZN ${item.total.toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
                     </table>
                 </div>
                 
                 <div class="totals">
-                    <div class="item">
-                        <strong>Subtotal:</strong>
-                        <span>MZN ${total.toFixed(2)}</span>
-                    </div>
                     <div class="item">
                         <strong>Total:</strong>
                         <span>MZN ${total.toFixed(2)}</span>
@@ -382,22 +367,12 @@ function generateReceiptContent(isPreview = false) {
                 
                 <div class="payment-methods">
                     <h4>Método de Pagamento:</h4>
-                    ${cashAmount > 0 ? `<div class="item">
-                        <span>Dinheiro:</span>
-                        <span>MZN ${cashAmount.toFixed(2)}</span>
-                    </div>` : ''}
-                    ${cardAmount > 0 ? `<div class="item">
-                        <span>Cartão:</span>
-                        <span>MZN ${cardAmount.toFixed(2)}</span>
-                    </div>` : ''}
-                    ${mpesaAmount > 0 ? `<div class="item">
-                        <span>M-Pesa:</span>
-                        <span>MZN ${mpesaAmount.toFixed(2)}</span>
-                    </div>` : ''}
-                    ${emolaAmount > 0 ? `<div class="item">
-                        <span>E-mola:</span>
-                        <span>MZN ${emolaAmount.toFixed(2)}</span>
-                    </div>` : ''}
+                    ${cashAmount > 0 ? `<div class="item">Dinheiro: <span>MZN ${cashAmount.toFixed(2)}</span></div>` : ''}
+                    ${cardAmount > 0 ? `<div class="item">Cartão: <span>MZN ${cardAmount.toFixed(2)}</span></div>` : ''}
+                    ${mpesaAmount > 0 ? `<div class="item">M-Pesa: <span>MZN ${mpesaAmount.toFixed(2)}</span></div>` : ''}
+                    ${emolaAmount > 0 ? `<div class="item">E-mola: <span>MZN ${emolaAmount.toFixed(2)}</span></div>` : ''}
+                    <div class="item"><strong>Total Pago:</strong><span>MZN ${totalPaid.toFixed(2)}</span></div>
+                    ${change > 0 ? `<div class="item">Troco: <span>MZN ${change.toFixed(2)}</span></div>` : ''}
                 </div>
                 
                 <div class="divider"></div>
@@ -405,10 +380,7 @@ function generateReceiptContent(isPreview = false) {
                 <div class="footer">
                     <p>Obrigado pela preferência!</p>
                     <p>www.luyoshcatering.co.mz</p>
-                    ${isPreview ? 
-                        '<p style="color: red;">ESTE É APENAS UM EXEMPLO - NÃO É UM RECIBO VÁLIDO</p>' : 
-                        '<p>Este documento não serve como fatura</p>'
-                    }
+                    ${isPreview ? '<p style="color: red;">ESTE É UM EXEMPLO - NÃO É UM RECIBO VÁLIDO</p>' : '<p>Este documento não serve como fatura</p>'}
                 </div>
                 
                 ${isPreview ? `

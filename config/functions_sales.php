@@ -234,3 +234,24 @@ function get_monthly_sales_trend() {
         return [];
     }
 }
+// Função para obter vendas por hora
+function get_hourly_sales_data() {
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare("
+            SELECT 
+                DATE_FORMAT(sale_date, '%H:00') as hour,
+                SUM(total_amount) as total_amount
+            FROM sales 
+            WHERE sale_date >= CURDATE() 
+            AND status != 'cancelled'
+            GROUP BY hour
+            ORDER BY hour
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error getting hourly sales data: " . $e->getMessage());
+        return [];
+    }
+}

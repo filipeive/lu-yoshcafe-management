@@ -6,15 +6,20 @@ $total_sales_today = get_total_sales_today();
 $open_orders = order_get_open_count();
 $low_stock_products = get_low_stock_products();
 $tables = get_all_tables();
+/// Certifique-se de que o $sales_data está definido e não vazio
+$sales_data = get_hourly_sales_data();
 
-// Dados para o gráfico (você precisará adaptar isso para seus dados reais)
-$sales_data = [
-    ['hour' => '09:00', 'value' => 1200],
-    ['hour' => '12:00', 'value' => 2800],
-    ['hour' => '15:00', 'value' => 3500],
-    ['hour' => '18:00', 'value' => 4200],
-    ['hour' => '21:00', 'value' => 3800],
-];
+// Formate os dados para o gráfico
+$formatted_sales_data = [];
+foreach ($sales_data as $data) {
+    $formatted_sales_data[] = [
+        'hour' => $data['hour'],
+        'value' => (float)$data['total_amount']
+    ];
+}
+// Passando os dados formatados para o gráfico em formato JSON
+$json_sales_data = json_encode($formatted_sales_data);
+
 
 include '../includes/header.php';
 ?>
@@ -30,10 +35,10 @@ include '../includes/header.php';
 
 .dashboard-container {
     padding: 1.5rem;
-    background-color: rgba(255, 255, 255,0.2);
+    background-color: rgba(255, 255, 255, 0.2);
     /*background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);*/
     min-height: 100vh;
-    border-radius:10px;
+    border-radius: 10px;
 }
 
 .stats-card {
@@ -86,7 +91,7 @@ include '../includes/header.php';
     border-radius: 0.75rem;
     padding: 1rem;
     transition: all 0.3s ease;
-    color: #fff !important; 
+    color: #fff !important;
 }
 
 .table-status:hover {
@@ -277,15 +282,13 @@ include '../includes/header.php';
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Vendas Diaria</h4>
+                    <h4 class="card-title">Vendas Diárias</h4>
                     <div class="chart-container" style="position: relative; height:300px;">
-                        <canvas id="salesChart"></canvas>
+                        <canvas id="dailySalesChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-
-
         <!-- Status das Mesas -->
         <div class="col-md-6 animate-fade-in" style="animation-delay: 0.7s;">
             <div class="card">
@@ -326,15 +329,19 @@ include '../includes/header.php';
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Configuração do gráfico de vendas
-    const ctx = document.getElementById('salesChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
+    // Dados para o gráfico diário (vendas por hora)
+    const dailySalesLabels = <?php echo json_encode(array_column($sales_data, 'hour')); ?>;
+    const dailySalesData = <?php echo json_encode(array_column($sales_data, 'value')); ?>;
+
+    // Configuração do gráfico de vendas diárias
+    const ctxDaily = document.getElementById('dailySalesChart').getContext('2d');
+    new Chart(ctxDaily, {
+        type: 'bar',
         data: {
-            labels: <?php echo json_encode(array_column($sales_data, 'hour')); ?>,
+            labels: dailySalesLabels,
             datasets: [{
                 label: 'Vendas (MZN)',
-                data: <?php echo json_encode(array_column($sales_data, 'value')); ?>,
+                data: dailySalesData,
                 borderColor: '#4f46e5',
                 backgroundColor: 'rgba(79, 70, 229, 0.1)',
                 tension: 0.4,
@@ -365,47 +372,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-    // Gráfico Semanal
-    const weeklySalesData = JSON.parse(document.getElementById('weeklySalesData').value);
-    const ctxWeekly = document.getElementById('salesChart').getContext('2d');
-    new Chart(ctxWeekly, {
-        type: 'line',
-        data: {
-            labels: Object.keys(weeklySalesData),
-            datasets: [{
-                label: 'Vendas (MZN)',
-                data: Object.values(weeklySalesData),
-                borderColor: '#4B49AC',
-                backgroundColor: 'rgba(75, 73, 172, 0.1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        borderDash: [2, 2]
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
-
 });
 </script>
 
