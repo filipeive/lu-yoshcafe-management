@@ -1,5 +1,5 @@
 /* Estilo geral do dashboard */
-    /*.card {
+    .card {
         border-radius: 1rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         transition: transform 0.2s;
@@ -35,7 +35,7 @@
         background-color: #1C1C1C;
         color: #F5F5F5;
     }
-*/
+
     /* Estilizando o background com o pseudo-elemento */
     body::before,
     .main-panel::before,
@@ -68,12 +68,12 @@
         /* Fundo semi-transparente */
     }
 
-    /* Cartões
+    /* Cartões*/
     .card {
         border-radius: 0.5rem;
         background: rgba(255, 255, 255, 0.9);
-        /* Fundo branco com transparência 
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        /* Fundo branco com transparência */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
         color: #000;
     }
 
@@ -82,7 +82,7 @@
         color: #000;
     }
     .table {
-        background: rgba(255, 255, 255, 0.8);
+        background: rgba(247, 148, 35, 0.8);
     }
 
     .table-hover tbody tr:hover {
@@ -93,7 +93,7 @@
         border-radius: 0.5rem;
         padding: 2rem;
         margin: 1rem;
-    }*/
+    }
 
     /* Estilos para estatísticas */
     .bg-primary {
@@ -162,128 +162,52 @@
   }
 /* Estilos para os botões de ações rápidas */
 .btn-gradient-primary {
-  background: linear-gradient(135deg, #007bff, #0056b3); /* Azul */
-  border: none;
+  background: linear-gradient(135deg, #007bff, #0056b3); 
   color:#fff;
 }
 
 .btn-gradient-primary:hover {
-  background: linear-gradient(135deg, #0056b3, #004085); /* Azul mais escuro */
+  background: linear-gradient(135deg, #0056b3, #004085); 
   color:#fff;
 
 }
 
 .btn-gradient-success {
-  background: linear-gradient(135deg, #28a745, #218838); /* Verde */
+  background: linear-gradient(135deg, #28a745, #218838); 
   border: none;
   color:#fff;
 
 }
 
 .btn-gradient-success:hover {
-  background: linear-gradient(135deg, #218838, #1e7e34); /* Verde mais escuro */
+  background: linear-gradient(135deg, #218838, #1e7e34); 
   color:#fff;
 
 }
 
 .btn-gradient-info {
-  background: linear-gradient(135deg, #17a2b8, #138496); /* Ciano */
+  background: linear-gradient(135deg, #17a2b8, #138496);
   border: none;
   color:#fff;
 
 }
 
 .btn-gradient-info:hover {
-  background: linear-gradient(135deg, #138496, #117a8b); /* Ciano mais escuro */
-  color:#fff;
+  background: linear-gradient(135deg, #138496, #117a8b); 
 
 }
 
 .btn-gradient-warning {
-  background: linear-gradient(135deg, #ffc107, #e0a800); /* Amarelo */
+  background: linear-gradient(135deg, #ffc107, #e0a800); 
   border: none;
   color:#fff;
 
 }
 
 .btn-gradient-warning:hover {
-  background: linear-gradient(135deg, #e0a800, #c69500); /* Amarelo mais escuro */
-  color:#fff;
+  background: linear-gradient(135deg, #e0a800, #c69500); 
 
 }
-
-    /* Botão do menu 
-    .navbar-toggler {
-        background-color: rgba(255, 165, 0, 0.7);
-        border-radius: 5px;
-        z-index: 1;
-        padding: 10px;
-
-    }
-
-   
-
-    .navbar-menu-wrapper {
-        justify-content: space-between;
-        padding: 10px;
-    }
-
-    .user-dropdown img {
-        border: 2px solid #fff;
-    }
-
-    .user-dropdown p {
-        color: #F5F5F5;
-        font-weight: 600;
-        margin: 0;
-    }
-
-    .dropdown-item {
-        color: #333;
-    }
-
-    .dropdown-item:hover {
-        background-color: rgba(255, 185, 45, 0.2);
-    }
-
-    .dropdown-header img {
-        width: 50px;
-        border: 2px solid #fff;
-    }
-
-    sidebar 
-    .sidebar {
-        padding: 10px;
-        border-right: 1px solid orange;
-        color: #fff;
-    }
-
-    .nav-item a.nav-link {
-        color: #FFF;
-        display: flex;
-        align-items: center;
-        padding: 12px 20px;
-        transition: background-color 0.3s ease;
-        font-size: 16px;
-    }
-
-    .nav-item a.nav-link:hover {
-        background-color: rgba(255, 165, 0, 0.3);
-    }
-
-    .menu-icon {
-        margin-right: 15px;
-    }
-
-    .menu-title {
-        font-weight: 600;
-        font-size: 16px;
-    }
-
-    .nav-item.active a.nav-link {
-        background-color: rgba(255, 165, 0, 0.4);
-    }
-    */
     .table-card.selected {
       background-color: #28a745; /* Verde */
       color: white;

@@ -3,17 +3,20 @@ require_once '../../config/config.php';
 require_login();
 
 $order_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$response = ["success" => false, "message" => ""];
 
 if ($order_id > 0) {
     if (order_complete_and_generate_sale($order_id)) {
-        $_SESSION['success_message'] = "Pedido finalizado e venda gerada com sucesso.";
+        $response["success"] = true;
+        $response["message"] = "Pedido finalizado e venda gerada com sucesso.";
     } else {
-        $_SESSION['error_message'] = "Erro ao finalizar pedido e gerar venda.";
+        $response["message"] = "Erro ao finalizar pedido e gerar venda.";
     }
 } else {
-    $_SESSION['error_message'] = "ID do pedido inválido.";
+    $response["message"] = "ID do pedido inválido.";
 }
 
-// Redirecionar de volta para a página de pedidos
-header("Location: ../orders.php");
+// Define o header como JSON e retorna a resposta
+header('Content-Type: application/json');
+echo json_encode($response);
 exit;

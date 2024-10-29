@@ -19,11 +19,61 @@ function order_get_open_count() {
     return $stmt->fetchColumn();
 }
 
-function order_create($table_id) {
+/*function order_create($table_id) {
     global $pdo;
     $stmt = $pdo->prepare("INSERT INTO orders (table_id, status, created_at) VALUES (?, 'active', NOW())");
     $stmt->execute([$table_id]);
     return $pdo->lastInsertId();
+}
+*/
+// Em functions_orders.php
+function order_create($table_id) {
+    global $pdo;
+    
+    // Certifique-se de que $table_id seja um valor individual
+    if (is_array($table_id)) {
+        // Pega o primeiro valor do array ou você pode tratar isso conforme necessário
+        $table_id = reset($table_id);
+    }
+    
+    try {
+        $pdo->beginTransaction();
+        
+        // Verificar se a mesa existe e está disponível
+        $stmt = $pdo->prepare("SELECT status, group_id FROM tables WHERE id = ?");
+        $stmt->execute([$table_id]); // Aqui, garanta que $table_id seja um valor simples
+        $table = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$table) {
+            throw new Exception("Mesa não encontrada");
+        }
+        
+        // Criar o pedido
+        $stmt = $pdo->prepare("
+            INSERT INTO orders (table_id, status, total_amount, created_at) 
+            VALUES (?, 'active', 0.00, NOW())
+        ");
+        $stmt->execute([$table_id]);
+        $order_id = $pdo->lastInsertId();
+        
+        // Atualizar status da mesa
+        $stmt = $pdo->prepare("UPDATE tables SET status = 'occupied' WHERE id = ?");
+        $stmt->execute([$table_id]);
+        
+        // Se a mesa faz parte de um grupo, atualizar todas as mesas do grupo
+        if ($table['group_id']) {
+            $stmt = $pdo->prepare("UPDATE tables SET status = 'occupied' WHERE group_id = ?");
+            $stmt->execute([$table['group_id']]);
+        }
+        
+        $pdo->commit();
+        return $order_id;
+        
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        error_log("Erro ao criar pedido: " . $e->getMessage());
+        throw new Exception("Erro ao criar pedido");
+    }
 }
 
 function order_get_by_id($order_id) {
@@ -120,10 +170,24 @@ function sale_get_total_today() {
     $stmt = $pdo->query("SELECT SUM(total_amount) FROM sales WHERE DATE(sale_date) = CURDATE() AND status = 'completed'");
     return $stmt->fetchColumn() ?: 0;
 }
-
+/*
 function get_paginated_order($offset, $per_page) {
     global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM orders ORDER BY table_id DESC LIMIT :offset, :per_page");
+    
+    // Use bindValue para evitar injeção de SQL
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->bindValue(':per_page', $per_page, PDO::PARAM_INT);
+
+    $stmt->execute();
+    
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+*/
+function get_paginated_order($offset, $per_page) {
+    global $pdo;
+    // Supondo que a coluna de data se chama 'created_at'
+    $stmt = $pdo->prepare("SELECT * FROM orders ORDER BY created_at DESC, table_id DESC LIMIT :offset, :per_page");
     
     // Use bindValue para evitar injeção de SQL
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);

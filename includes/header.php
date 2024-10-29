@@ -140,6 +140,13 @@ try {
                             <span class="menu-title">Dashboard</span>
                         </a>
                     </li>
+                    <!-- Novo item para Ponto de Venda -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="pos.php">
+                            <i class="mdi mdi-cash-multiple menu-icon"></i>
+                            <span class="menu-title">Ponto de Venda</span>
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="sales.php">
                             <i class="mdi mdi-cash-register menu-icon"></i>

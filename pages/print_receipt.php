@@ -19,194 +19,161 @@ $change = max(0, $total_paid - $sale['total_amount']);
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recibo da Venda #<?php echo $sale_id; ?> - Lu & Yosh Catering</title>
+    <title>Recibo da Venda #<?php echo $sale_id; ?></title>
     <style>
-    body {
-        font-family: 'Arial', sans-serif;
-        font-size: 12px;
-        line-height: 1.6;
-        color: #333;
+    @page {
+        size: 58mm auto;
         margin: 0;
-        padding: 20px;
     }
 
-    .receipt {
-        width: 80mm;
+    body {
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        width: 58mm;
         margin: 0 auto;
-        padding: 10px;
-        border: 1px solid #ddd;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 5px;
+        color: #000;
     }
 
-    .header {
+    .header,
+    .footer {
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 5px;
     }
 
-    .logo {
-        max-width: 80px;
-        height: auto;
-        margin-bottom: 10px;
+    .header img {
+        max-width: 120px;
     }
 
-    h2,
-    h3 {
-        margin: 5px 0;
+    .divider {
+        border-top: 1px dashed #000;
+        margin: 8px 0;
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 15px;
-    }
-
-    th,
-    td {
-        border-bottom: 1px solid #ddd;
-        padding: 8px 4px;
-        text-align: left;
-    }
-
-    th {
-        background-color: #f8f8f8;
+    .item {
+        display: flex;
+        justify-content: space-between;
+        margin: 3px 0;
     }
 
     .total {
         font-weight: bold;
-        background-color: #f0f0f0;
-    }
-
-    .payment-methods {
-        margin-bottom: 15px;
+        margin-top: 10px;
     }
 
     .footer {
-        margin-top: 20px;
-        text-align: center;
         font-size: 10px;
-        color: #666;
+        font-weight: bold;
+        margin-top: 20px;
     }
 
     @media print {
-        body {
-            width: 80mm;
-            margin: 0;
-            padding: 0;
-        }
-
-        .receipt {
-            border: none;
-            box-shadow: none;
+        .no-print {
+            display: none;
         }
     }
+    .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .print-button, .close-button {
+            padding: 8px 16px;
+            margin: 0 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+        .print-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .close-button {
+            background-color: #f44336;
+            color: white;
+        }
     </style>
 </head>
 
 <body>
-    <div class="receipt">
-        <div class="header">
-            <img src="../public/assets/images/logo.png" alt="Lu & Yosh Catering Logo" class="logo">
-            <h2>Lu & Yosh Catering</h2>
-            <p>Av. Eduardo Mondlane, 1234<br>
-                Quelimane, Moçambique<br>
-                Tel: +258 21 123 456<br>
-                NUIT: 123456789</p>
-            <h3>Recibo da Venda #<?php echo $sale_id; ?></h3>
-            <p>Data: <?php echo date('d/m/Y H:i', strtotime($sale['sale_date'])); ?></p>
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Produto</th>
-                    <th>Qtd</th>
-                    <th>Preço</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($sale_items as $item): ?>
-                <tr>
-                    <td><?php echo get_product_name($item['product_id']); ?></td>
-                    <td><?php echo $item['quantity']; ?></td>
-                    <td><?php echo number_format($item['unit_price'], 2); ?></td>
-                    <td><?php echo number_format($item['quantity'] * $item['unit_price'], 2); ?></td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-            <tfoot>
-                <tr class="total">
-                    <td colspan="3">Total</td>
-                    <td><?php echo number_format($sale['total_amount'], 2); ?></td>
-                </tr>
-            </tfoot>
-        </table>
-        <div class="payment-methods">
-            <h4>Métodos de Pagamento:</h4>
-            <table>
-                <?php if ($sale['cash_amount'] > 0): ?>
-                <tr>
-                    <td>Dinheiro:</td>
-                    <td><?php echo number_format($sale['cash_amount'], 2); ?></td>
-                </tr>
-                <?php endif; ?>
-                <?php if ($sale['card_amount'] > 0): ?>
-                <tr>
-                    <td>Cartão:</td>
-                    <td><?php echo number_format($sale['card_amount'], 2); ?></td>
-                </tr>
-                <?php endif; ?>
-                <?php if ($sale['mpesa_amount'] > 0): ?>
-                <tr>
-                    <td>M-Pesa:</td>
-                    <td><?php echo number_format($sale['mpesa_amount'], 2); ?></td>
-                </tr>
-                <?php endif; ?>
-                <?php if ($sale['emola_amount'] > 0): ?>
-                <tr>
-                    <td>Emola:</td>
-                    <td><?php echo number_format($sale['emola_amount'], 2); ?></td>
-                </tr>
-                <?php endif; ?>
-                <tr class="total">
-                    <td>Total Pago:</td>
-                    <td><?php echo number_format($total_paid, 2); ?></td>
-                </tr>
-                <?php if ($change > 0): ?>
-                <tr>
-                    <td>Troco:</td>
-                    <td><?php echo number_format($change, 2); ?></td>
-                </tr>
-                <?php endif; ?>
-            </table>
-        </div>
-        <div class="footer">
-            <p>Obrigado pela sua preferência!</p>
-            <p>Este documento não serve como fatura</p>
+    <div class="header">
+        <img src="../public/assets/images/Logo.png" alt="Lu & Yosh Catering Logo">
+        <h2>Lu & Yosh Catering</h2>
+        <p>Av. Eduardo Mondlane, 1234<br>Quelimane, Moçambique<br>Tel: +258 21 123 456<br>NUIT: 123456789</p>
+        <h3>Recibo da Venda #<?php echo $sale_id; ?></h3>
+        <p>Data: <?php echo date('d/m/Y H:i', strtotime($sale['sale_date'])); ?></p>
+    </div>
+
+    <div class="divider"></div>
+
+    <?php foreach ($sale_items as $item): ?>
+    <div class="item">
+        <span><?php echo htmlspecialchars(get_product_name($item['product_id'])); ?>
+            x<?php echo $item['quantity']; ?></span>
+        <span><?php echo number_format($item['quantity'] * $item['unit_price'], 2); ?> MT</span>
+    </div>
+    <?php endforeach; ?>
+
+    <div class="divider"></div>
+
+    <div class="total">
+        <div class="item">
+            <span>Total:</span>
+            <span><?php echo number_format($sale['total_amount'], 2); ?> MT</span>
         </div>
     </div>
+
+    <div class="divider"></div>
+
+    <div class="payment-methods">
+        <h4>Métodos de Pagamento:</h4>
+        <?php if ($sale['cash_amount'] > 0): ?><p>Dinheiro: <?php echo number_format($sale['cash_amount'], 2); ?> MT</p>
+        <?php endif; ?>
+        <?php if ($sale['card_amount'] > 0): ?><p>Cartão: <?php echo number_format($sale['card_amount'], 2); ?> MT</p>
+        <?php endif; ?>
+        <?php if ($sale['mpesa_amount'] > 0): ?><p>M-Pesa: <?php echo number_format($sale['mpesa_amount'], 2); ?> MT</p>
+        <?php endif; ?>
+        <?php if ($sale['emola_amount'] > 0): ?><p>Emola: <?php echo number_format($sale['emola_amount'], 2); ?> MT</p>
+        <?php endif; ?>
+        <p>Total Pago: <?php echo number_format($total_paid, 2); ?> MT</p>
+        <?php if ($change > 0): ?><p>Troco: <?php echo number_format($change, 2); ?> MT</p><?php endif; ?>
+    </div>
+
+    <div class="footer">
+        <p>Obrigado pela sua preferência!</p>
+        <p>Este documento não serve como fatura</p>
+        <p>Impresso em: <?php echo date('d/m/Y H:i:s'); ?></p>
+    </div>
+    <div class="no-print button-container">
+        <button class="print-button" onclick="printAndClose()">
+            <i class="mdi mdi-printer"></i> Imprimir
+        </button>
+        <button class="close-button" onclick="closeAndReturn()">
+            <i class="mdi mdi-close"></i> Fechar
+        </button>
+    </div>
     <script>
-        window.onload = function() {
+    function imprimirRecibo() {
         window.print();
+        // Aguarda 2 segundos e redireciona para a página anterior
         setTimeout(function() {
-            window.close();
+            window.history.back();
         }, 2000);
     }
-    window.onafterprint = function() {
-        window.close();
+
+     // Função para fechar a janela e redirecionar para pedidos
+     function closeAndReturn() {
+        window.location.href = "sales.php";
     }
-    window.onbeforeprint = function() {
+
+    // Imprime automaticamente ao carregar a página
+    window.onload = function() {
         window.print();
-    }
 
-    window.onbeforeunload = function() {
-        window.close();
-    }
-
-    window.onafterprint = function() {
-        // A janela será fechada automaticamente após 2 segundos
-    }
+        // Simula um clique para fechar e redirecionar após 2 segundos
+        setTimeout(closeAndReturn, 500);
+    };
     </script>
+
 </body>
 
 </html>

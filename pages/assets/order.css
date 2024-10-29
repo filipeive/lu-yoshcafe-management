@@ -1,0 +1,146 @@
+
+.product-card {
+    transition: all 0.3s ease;
+}
+
+.product-card.selected {
+    border-color: #00d25b;
+    background-color: rgba(0, 210, 91, 0.1);
+}
+
+.quantity-control {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quantity-btn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quantity-input {
+    width: 60px;
+    text-align: center;
+}
+
+.category-pills {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+}
+
+.category-pill {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    background: #f3f3f3;
+    transition: all 0.3s ease;
+}
+
+.category-pill.active {
+    background: #00d25b;
+    color: white;
+}
+
+.order-summary {
+    position: sticky;
+    top: 20px;
+}
+
+.search-field {
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 991px) {
+    .order-summary {
+        margin-top: 2rem;
+    }
+}
+
+.border-left-primary {
+    border-left: 4px solid #4e73df !important;
+}
+
+.border-left-success {
+    border-left: 4px solid #1cc88a !important;
+}
+
+.border-left-info {
+    border-left: 4px solid #36b9cc !important;
+}
+
+.border-left-warning {
+    border-left: 4px solid #f6c23e !important;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.table th {
+    background-color: #f8f9fc;
+    border-top: none;
+}
+
+.badge {
+    padding: 5px 12px;
+    font-weight: 500;
+    border-radius: 4px;
+}
+
+.badge-success {
+    background-color: rgba(57, 198, 138, 0.15);
+    color: #39c68a;
+}
+
+.badge-warning {
+    background-color: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+}
+
+.badge-danger {
+    background-color: rgba(242, 78, 78, 0.15);
+    color: #f24e4e;
+}
+
+.badge-info {
+    background-color: rgba(0, 188, 212, 0.15);
+    color: #00bcd4;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.pagination-rounded .page-link {
+    border-radius: 50%;
+    margin: 0 3px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

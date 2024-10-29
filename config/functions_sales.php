@@ -1,6 +1,5 @@
 <?php
 // Funções de Vendas
-
 // Função para obter todas as vendas
 function get_all_sales() {
     global $pdo; // Acessando a conexão global com o banco de dados
@@ -103,7 +102,7 @@ function count_all_sales() {
     $stmt->execute();
     return $stmt->fetch()['count'];
 }
-
+/*
 function get_paginated_sales($offset, $per_page) {
     global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM sales ORDER BY sale_date DESC LIMIT :offset, :per_page");
@@ -115,4 +114,123 @@ function get_paginated_sales($offset, $per_page) {
     $stmt->execute();
     
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}*/
+function get_paginated_sales($offset, $per_page) {
+    global $pdo;
+    // Supondo que a coluna de identificação seja 'sale_id' e a data de venda seja 'sale_date'
+    $stmt = $pdo->prepare("SELECT * FROM sales ORDER BY sale_date DESC, id DESC LIMIT :offset, :per_page");
+    
+    // PDO usa bindValue para evitar injeção de SQL
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->bindValue(':per_page', $per_page, PDO::PARAM_INT);
+
+    $stmt->execute();
+    
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function get_total_sales_amount() {
+    global $pdo;
+    try {
+        $stmt = $pdo->query("SELECT COALESCE(SUM(total_amount), 0) as total FROM sales WHERE status != 'cancelled'");
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    } catch (PDOException $e) {
+        error_log("Error getting total sales amount: " . $e->getMessage());
+        return 0;
+    }
+}
+
+function get_today_sales_amount() {
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare("
+            SELECT COALESCE(SUM(total_amount), 0) as total 
+            FROM sales 
+            WHERE DATE(sale_date) = CURRENT_DATE 
+            AND status != 'cancelled'
+        ");
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    } catch (PDOException $e) {
+        error_log("Error getting today's sales amount: " . $e->getMessage());
+        return 0;
+    }
+}
+
+function get_pending_sales_count() {
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*) as count 
+            FROM sales 
+            WHERE status = 'pending'
+        ");
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+    } catch (PDOException $e) {
+        error_log("Error getting pending sales count: " . $e->getMessage());
+        return 0;
+    }
+}
+
+// Additional helper function for weekly sales (useful for reports)
+function get_weekly_sales_amount() {
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare("
+            SELECT COALESCE(SUM(total_amount), 0) as total 
+            FROM sales 
+            WHERE sale_date >= DATE_SUB(CURRENT_DATE, INTERVAL 7 DAY)
+            AND status != 'cancelled'
+        ");
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    } catch (PDOException $e) {
+        error_log("Error getting weekly sales amount: " . $e->getMessage());
+        return 0;
+    }
+}
+
+// Function to get sales by payment method
+function get_sales_by_payment_method() {
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare("
+            SELECT 
+                payment_method,
+                COUNT(*) as count,
+                SUM(total_amount) as total
+            FROM sales 
+            WHERE status != 'cancelled'
+            GROUP BY payment_method
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error getting sales by payment method: " . $e->getMessage());
+        return [];
+    }
+}
+
+// Function to get monthly sales trend
+function get_monthly_sales_trend() {
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare("
+            SELECT 
+                DATE_FORMAT(sale_date, '%Y-%m') as month,
+                COUNT(*) as total_sales,
+                SUM(total_amount) as total_amount
+            FROM sales 
+            WHERE sale_date >= DATE_SUB(CURRENT_DATE, INTERVAL 6 MONTH)
+            AND status != 'cancelled'
+            GROUP BY DATE_FORMAT(sale_date, '%Y-%m')
+            ORDER BY month DESC
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error getting monthly sales trend: " . $e->getMessage());
+        return [];
+    }
 }

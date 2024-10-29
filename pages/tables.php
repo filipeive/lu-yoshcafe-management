@@ -1,5 +1,4 @@
 <?php
-// No início do seu arquivo PHP, adicione:
 
 if (isset($_GET['success'])) {
     echo '<div class="alert alert-success">' . htmlspecialchars($_GET['success']) . '</div>';
@@ -42,9 +41,9 @@ include '../includes/header.php';
         <div class="card">
             <div class="card-body">
                 <h4 class="my-4 card-title">Mesas</h4>
-                <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#createTableModal">
+               <!-- <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#createTableModal">
                     Adicionar Nova Mesa
-                </button>
+                </button>-->
                 <div class="row">
                     <?php foreach ($tables as $table): ?>
                     <div class="col-md-4 mb-4">
@@ -59,13 +58,13 @@ include '../includes/header.php';
                                     Separar Mesa
                                 </button>
                                 <?php endif; ?>
-                                <p class="card-text">Capacidade: <?php echo $table['capacity']; ?></p>
+                                <p class="card-text">Capacidade: <?php echo $table['capacity']; ?> </p>
                                 <p
                                     class="badge <?php echo $table['real_status'] == 'livre' ? 'bg-success' : ($table['real_status'] == 'ocupada' ? 'bg-warning' : 'bg-danger'); ?>">
                                     <?php echo ucfirst($table['real_status']); ?>
                                 </p>
 
-                                <div class="d-flex justify-content-around">
+                                <div class="d-flex justify-content-around flex-wrap">
                                     <?php if ($table['real_status'] == 'livre'): ?>
                                     <button type="button" class="btn btn-primary btn-sm occupy-table"
                                         data-table-id="<?php echo $table['id']; ?>">
@@ -75,10 +74,16 @@ include '../includes/header.php';
                                         data-table-id="<?php echo $table['id']; ?>">
                                         Unir Mesas
                                     </button>
-                                    <?php elseif ($table['real_status'] == 'ocupada'): ?>
+                                    <?php elseif ($table['real_status'] == 'ocupada' || $table['real_status'] == 'com_pedido'): ?>
+                                    <?php if ($table['real_status'] == 'com_pedido'): ?>
+                                    <a href="view_order.php?order_id=<?php echo $table['id']; ?>"
+                                        class="btn btn-info btn-sm mb-2">
+                                        Ver Pedido
+                                    </a>
+                                    <?php endif; ?>
                                     <?php if ($table['real_status'] == 'ocupada' || $table['group_id']): ?>
                                     <a href="create_order.php?table_id=<?php echo $table['id']; ?>"
-                                        class="btn btn-success btn-sm">
+                                        class="btn btn-success btn-sm mb-2">
                                         Criar Pedido
                                     </a>
                                     <?php endif; ?>
@@ -103,44 +108,54 @@ include '../includes/header.php';
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
 $(document).ready(function() {
-    // Ocupar mesa - abre modal e preenche ID
+    // Ocupar mesa - apenas abre modal e preenche ID
     $(document).on('click', '.occupy-table', function() {
         var tableId = $(this).data('table-id');
-        $('#occupyTableId').val(tableId); // Preencher o ID da mesa no modal
-        $('#occupyTableModal').modal('show'); // Exibir o modal
+        $('#occupyTableId').val(tableId);
+        $('#occupyTableModal').modal('show');
     });
 
-    // Liberar mesa - abre modal e preenche ID
+    // Liberar mesa - apenas abre modal e preenche ID
     $(document).on('click', '.free-table', function() {
         var tableId = $(this).data('table-id');
-        $('#freeTableId').val(tableId); // Preencher o ID da mesa no modal
-        $('#freeTableModal').modal('show'); // Exibir o modal
+        $('#freeTableId').val(tableId);
+        $('#freeTableModal').modal('show');
     });
 
     // Unir mesas - abre modal
     $(document).on('click', '.merge-table', function() {
-        $('#mergeTablesModal').modal('show'); // Exibir o modal
+        $('#mergeTablesModal').modal('show');
     });
 
     // Separar mesa - abre modal e preenche ID
     $(document).on('click', '.split-table', function() {
         var tableId = $(this).data('table-id');
-        $('#splitTableId').val(tableId); // Preencher o ID da mesa no modal
-        $('#splitTablesModal').modal('show'); // Exibir o modal
+        $('#splitTableId').val(tableId);
+        $('#splitTablesModal').modal('show');
     });
 
     // Processar ocupação da mesa via formulário modal
     $('#occupyTableModal form').on('submit', function(e) {
         e.preventDefault();
         var tableId = $('#occupyTableId').val();
+        var $modal = $('#occupyTableModal');
 
         $.post('table_management.php', {
             action: 'occupy',
             table_id: tableId
         }, function(response) {
+            $modal.modal('hide');
             if (response.success) {
-                Swal.fire('Sucesso', response.message, 'success');
-                location.reload();
+                Swal.fire({
+                    title: 'Mesa ocupada!',
+                    text: response.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
             } else {
                 Swal.fire('Erro', response.message, 'error');
             }
@@ -151,42 +166,60 @@ $(document).ready(function() {
     $('#freeTableModal form').on('submit', function(e) {
         e.preventDefault();
         var tableId = $('#freeTableId').val();
+        var $modal = $('#freeTableModal');
 
         $.post('table_management.php', {
             action: 'free',
             table_id: tableId
         }, function(response) {
+            $modal.modal('hide');
             if (response.success) {
-                Swal.fire('Sucesso', response.message, 'success');
-                location.reload();
+                Swal.fire({
+                    title: 'Mesa liberada!',
+                    text: response.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
             } else {
                 Swal.fire('Erro', response.message, 'error');
             }
         }, 'json');
     });
 
-    // Unir mesas via formulário modal
-    $(document).ready(function() {
     // Selecionar/Deselecionar mesa
     $(document).on('click', '.table-card', function() {
         $(this).toggleClass('selected');
     });
-    
+
     // Manipulação do envio do formulário de união
     $('#mergeTablesForm').on('submit', function(e) {
         e.preventDefault();
         var selectedTables = $('.table-card.selected').map(function() {
             return $(this).data('table-id');
         }).get();
+        var $modal = $('#mergeTablesModal');
 
         if (selectedTables.length > 0) {
             $.post('table_management.php', {
                 action: 'merge',
                 table_ids: selectedTables
             }, function(response) {
+                $modal.modal('hide');
                 if (response.success) {
-                    Swal.fire('Sucesso', response.message, 'success');
-                    location.reload();
+                    Swal.fire({
+                        title: 'Mesas unidas!',
+                        text: response.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
                 } else {
                     Swal.fire('Erro', response.message, 'error');
                 }
@@ -195,57 +228,58 @@ $(document).ready(function() {
             Swal.fire('Atenção', 'Por favor, selecione pelo menos uma mesa.', 'warning');
         }
     });
-});
-
 
     // Separar mesa via formulário modal
     $('#splitTableForm').on('submit', function(e) {
         e.preventDefault();
         var tableId = $('#splitTableId').val();
+        var $modal = $('#splitTablesModal');
 
         $.post('table_management.php', {
             action: 'split',
             table_id: tableId
         }, function(response) {
+            $modal.modal('hide');
             if (response.success) {
-                Swal.fire('Sucesso', response.message, 'success');
-                location.reload();
+                Swal.fire({
+                    title: 'Mesa separada!',
+                    text: response.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
             } else {
                 Swal.fire('Erro', response.message, 'error');
             }
         }, 'json');
     });
-});
 
+    // Criar mesa
+    $('#createTableForm').on('submit', function(e) {
+        e.preventDefault();
 
-// Funções para interceptar o envio de formulários
-$('#createTableForm').on('submit', function(e) {
-    e.preventDefault();
-    // Adiciona lógica para criar a mesa...
-    Swal.fire({
-        title: 'Mesa criada com sucesso!',
-        icon: 'success',
-        confirmButtonText: 'OK'
-    });
-});
-
-$('#occupyTableForm').on('submit', function(e) {
-    e.preventDefault();
-    // Adiciona lógica para ocupar a mesa...
-    Swal.fire({
-        title: 'Mesa ocupada!',
-        icon: 'success',
-        confirmButtonText: 'OK'
-    });
-});
-
-$('#freeTableForm').on('submit', function(e) {
-    e.preventDefault();
-    // Adiciona lógica para liberar a mesa...
-    Swal.fire({
-        title: 'Mesa liberada!',
-        icon: 'success',
-        confirmButtonText: 'OK'
+        $.post('table_management.php', {
+            action: 'create',
+            // Adicione aqui outros dados do formulário necessários
+        }, function(response) {
+            if (response.success) {
+                Swal.fire({
+                    title: 'Mesa criada com sucesso!',
+                    text: response.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
+            } else {
+                Swal.fire('Erro', response.message, 'error');
+            }
+        }, 'json');
     });
 });
 </script>
