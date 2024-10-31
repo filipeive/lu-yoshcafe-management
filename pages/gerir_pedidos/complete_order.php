@@ -19,4 +19,6 @@ if ($order_id > 0) {
 // Define o header como JSON e retorna a resposta
 header('Content-Type: application/json');
 echo json_encode($response);
+//garante o redirecionamento para orders.php
+header("Location: ../orders.php");
 exit;

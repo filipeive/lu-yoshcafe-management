@@ -148,202 +148,230 @@ $products = get_all_products();
     justify-content: center;
 }
 </style>
-<div class="content-wrapper">
-    <div class="row">
-        <!-- Stats Cards Row -->
-        <div class="col-sm-12 col-lg-3 grid-margin stretch-card">
-            <div class="card card-rounded">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h4 class="card-title card-title-dash">Vendas Totais</h4>
-                        <i class="mdi mdi-cash-multiple text-primary icon-md"></i>
-                    </div>
-                    <div class="mt-3">
-                        <h2 class="rate-percentage">MZN <?php echo number_format(get_total_sales_amount(), 2); ?></h2>
-                        <p class="text-success mb-0">
-                            <i class="mdi mdi-trending-up"></i> Total acumulado
+<div class="row">
+    <!-- Stats Cards Row -->
+    <div class="col-sm-12 col-lg-3 grid-margin stretch-card">
+        <div class="card card-rounded border-start border-primary border-4">
+            <div class="card-body pb-0">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="card-title card-title-dash text-muted mb-1">Vendas Totais</h6>
+                        <h2 class="rate-percentage text-primary mb-2">MZN
+                            <?php echo number_format(get_total_sales_amount(), 2); ?></h2>
+                        <p class="text-success d-flex align-items-center mb-3">
+                            <i class="mdi mdi-trending-up me-1"></i>
+                            <span>Total acumulado</span>
                         </p>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                        <i class="mdi mdi-cash-multiple text-primary icon-md m-0"></i>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-sm-12 col-lg-3 grid-margin stretch-card">
-            <div class="card card-rounded">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h4 class="card-title card-title-dash">Vendas Hoje</h4>
-                        <i class="mdi mdi-calendar-today text-success icon-md"></i>
-                    </div>
-                    <div class="mt-3">
-                        <h2 class="rate-percentage">MZN <?php echo number_format(get_today_sales_amount(), 2); ?></h2>
-                        <p class="text-success mb-0">
-                            <i class="mdi mdi-clock"></i> Hoje
+    <div class="col-sm-12 col-lg-3 grid-margin stretch-card">
+        <div class="card card-rounded border-start border-success border-4">
+            <div class="card-body pb-0">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="card-title card-title-dash text-muted mb-1">Vendas Hoje</h6>
+                        <h2 class="rate-percentage text-success mb-2">MZN
+                            <?php echo number_format(get_today_sales_amount(), 2); ?></h2>
+                        <p class="text-success d-flex align-items-center mb-3">
+                            <i class="mdi mdi-clock me-1"></i>
+                            <span>Hoje</span>
                         </p>
+                    </div>
+                    <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                        <i class="mdi mdi-calendar-today text-success icon-md m-0"></i>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-sm-12 col-lg-3 grid-margin stretch-card">
-            <div class="card card-rounded">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h4 class="card-title card-title-dash">Total Transações</h4>
-                        <i class="mdi mdi-receipt text-info icon-md"></i>
-                    </div>
-                    <div class="mt-3">
-                        <h2 class="rate-percentage"><?php echo $total_sales; ?></h2>
-                        <p class="text-info mb-0">
-                            <i class="mdi mdi-chart-line"></i> Transações realizadas
+    <div class="col-sm-12 col-lg-3 grid-margin stretch-card">
+        <div class="card card-rounded border-start border-info border-4">
+            <div class="card-body pb-0">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="card-title card-title-dash text-muted mb-1">Total Transações</h6>
+                        <h2 class="rate-percentage text-info mb-2"><?php echo $total_sales; ?></h2>
+                        <p class="text-info d-flex align-items-center mb-3">
+                            <i class="mdi mdi-chart-line me-1"></i>
+                            <span>Transações realizadas</span>
                         </p>
+                    </div>
+                    <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                        <i class="mdi mdi-receipt text-info icon-md m-0"></i>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-sm-12 col-lg-3 grid-margin stretch-card">
-            <div class="card card-rounded">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h4 class="card-title card-title-dash">Pendentes</h4>
-                        <i class="mdi mdi-clock-alert text-warning icon-md"></i>
-                    </div>
-                    <div class="mt-3">
-                        <h2 class="rate-percentage"><?php echo get_pending_sales_count(); ?></h2>
-                        <p class="text-warning mb-0">
-                            <i class="mdi mdi-alert-circle"></i> Aguardando processamento
+    <div class="col-sm-12 col-lg-3 grid-margin stretch-card">
+        <div class="card card-rounded border-start border-warning border-4">
+            <div class="card-body pb-0">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="card-title card-title-dash text-muted mb-1">Pendentes</h6>
+                        <h2 class="rate-percentage text-warning mb-2"><?php echo get_pending_sales_count(); ?></h2>
+                        <p class="text-warning d-flex align-items-center mb-3">
+                            <i class="mdi mdi-alert-circle me-1"></i>
+                            <span>Aguardando processamento</span>
                         </p>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                        <i class="mdi mdi-clock-alert text-warning icon-md m-0"></i>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Sales Table -->
-        <div class="col-lg-12 grid-margin stretch-card">
-            <div class="card card-rounded">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h4 class="card-title">Histórico de Vendas</h4>
-                        <div class="d-flex align-items-center">
-                            <div class="input-group" style="width: 250px;">
-                                <input type="text" class="form-control" placeholder="Pesquisar vendas..."
-                                    id="salesSearch">
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary" type="button">
-                                        <i class="mdi mdi-magnify"></i>
-                                    </button>
-                                </div>
+    <!-- Sales Table Card -->
+    <div class="col-lg-12 grid-margin">
+        <div class="card card-rounded shadow-sm">
+            <div class="card-body">
+                <!-- Header Section -->
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                    <div class="d-flex align-items-center">
+                        <h4 class="card-title mb-0 me-2">Histórico de Vendas</h4>
+                        <span class="badge bg-primary rounded-pill"><?php echo $total_sales; ?> vendas</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <!-- Search Bar -->
+                        <div class="search-field d-none d-md-flex">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0">
+                                    <i class="mdi mdi-magnify text-primary"></i>
+                                </span>
+                                <input type="text" class="form-control bg-transparent border-start-0 ps-0"
+                                    placeholder="Pesquisar vendas..." id="salesSearch">
                             </div>
-                            <button type="button" class="btn btn-primary ms-3" data-bs-toggle="modal"
-                                data-bs-target="#newSaleModal">
-                                <i class="mdi mdi-plus"></i> Nova Venda
-                            </button>
                         </div>
+                        <!-- New Sale Button -->
+                        <button type="button" class="btn btn-primary btn-icon-text px-4" data-bs-toggle="modal"
+                            data-bs-target="#newSaleModal">
+                            <i class="mdi mdi-plus btn-icon-prepend"></i>
+                            Nova Venda
+                        </button>
                     </div>
+                </div>
 
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Data</th>
-                                    <th>Total</th>
-                                    <th>Método de Pagamento</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($sales as $sale): ?>
-                                <tr>
-                                    <td class="text-muted">#<?php echo str_pad($sale['id'], 5, '0', STR_PAD_LEFT); ?>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex">
-                                            <i class="mdi mdi-calendar me-2 text-primary"></i>
-                                            <?php echo date('d/m/Y H:i', strtotime($sale['sale_date'])); ?>
+                <!-- Enhanced Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="py-3">ID</th>
+                                <th class="py-3">Data</th>
+                                <th class="py-3">Total</th>
+                                <th class="py-3">Método de Pagamento</th>
+                                <th class="py-3">Status</th>
+                                <th class="py-3 text-center" width="200">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($sales as $sale): ?>
+                            <tr>
+                                <td class="py-3">
+                                    <span class="fw-medium text-primary">
+                                        #<?php echo str_pad($sale['id'], 5, '0', STR_PAD_LEFT); ?>
+                                    </span>
+                                </td>
+                                <td class="py-3">
+                                    <div class="d-flex align-items-center">
+                                        <span class="bg-primary bg-opacity-10 p-2 rounded me-2">
+                                            <i class="mdi mdi-calendar text-primary"></i>
+                                        </span>
+                                        <div>
+                                            <div class="fw-medium">
+                                                <?php echo date('d/m/Y', strtotime($sale['sale_date'])); ?></div>
+                                            <small
+                                                class="text-muted"><?php echo date('H:i', strtotime($sale['sale_date'])); ?></small>
                                         </div>
-                                    </td>
-                                    <td class="font-weight-bold">MZN
-                                        <?php echo number_format($sale['total_amount'], 2); ?></td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
+                                    </div>
+                                </td>
+                                <td class="py-3">
+                                    <div class="fw-medium">MZN <?php echo number_format($sale['total_amount'], 2); ?>
+                                    </div>
+                                </td>
+                                <td class="py-3">
+                                    <div class="d-flex align-items-center">
+                                        <span class="bg-success bg-opacity-10 p-2 rounded me-2">
                                             <i
-                                                class="mdi <?php echo get_payment_icon_mdi($sale['payment_method']); ?> me-2"></i>
-                                            <?php echo ucfirst($sale['payment_method']); ?>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="badge <?php echo get_status_class_staradmin($sale['status']); ?>">
-                                            <?php echo ucfirst($sale['status']); ?>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <button class="btn btn-outline-primary btn-icon btn-rounded"
-                                                onclick="viewSaleDetails(<?php echo $sale['id']; ?>)">
-                                                <i class="mdi mdi-eye"></i>
-                                            </button>
-                                            <button class="btn btn-outline-info btn-icon btn-rounded"
-                                                onclick="printReceipt(<?php echo $sale['id']; ?>)">
-                                                <i class="mdi mdi-printer"></i>
-                                            </button>
-                                            <div class="dropdown">
-                                                <button class="btn btn-outline-secondary btn-icon btn-rounded"
-                                                    type="button" data-bs-toggle="dropdown">
-                                                    <i class="mdi mdi-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="#">
-                                                            <i class="mdi mdi-pencil me-2"></i> Editar
-                                                        </a></li>
-                                                    <li><a class="dropdown-item" href="#">
-                                                            <i class="mdi mdi-file-pdf me-2"></i> Exportar PDF
-                                                        </a></li>
-                                                    <li>
-                                                        <hr class="dropdown-divider">
-                                                    </li>
-                                                    <li><a class="dropdown-item text-danger" href="#">
-                                                            <i class="mdi mdi-delete me-2"></i> Excluir
-                                                        </a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                                                class="mdi <?php echo get_payment_icon_mdi($sale['payment_method']); ?> text-success"></i>
+                                        </span>
+                                        <span class="fw-medium"><?php echo ucfirst($sale['payment_method']); ?></span>
+                                    </div>
+                                </td>
+                                <td class="py-3">
+                                    <div
+                                        class="badge <?php echo get_status_class_staradmin($sale['status']); ?> rounded-pill px-3">
+                                        <i class="mdi mdi-circle-medium me-1"></i>
+                                        <?php echo ucfirst($sale['status']); ?>
+                                    </div>
+                                </td>
+                                <td class="py-3">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button class="btn btn-primary btn-icon btn-sm" data-bs-toggle="tooltip"
+                                            title="Ver Detalhes" onclick="viewSaleDetails(<?php echo $sale['id']; ?>)">
+                                            <i class="mdi mdi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-info btn-icon btn-sm" data-bs-toggle="tooltip"
+                                            title="Imprimir" onclick="printReceipt(<?php echo $sale['id']; ?>)">
+                                            <i class="mdi mdi-printer"></i>
+                                        </button>
+                                        <!--<button class="btn btn-warning btn-icon btn-sm" data-bs-toggle="tooltip"
+                                            title="Editar" onclick="editSale(<?php //echo $sale['id']; ?>)">
+                                            <i class="mdi mdi-pencil"></i>
+                                        </button>-->
+                                        <button class="btn btn-warning btn-icon btn-sm" data-bs-toggle="tooltip"
+                                            title="Exportar PDF" onclick="exportPDF(<?php echo $sale['id']; ?>)">
+                                            <i class="mdi mdi-download"></i> <!-- Ícone alterado para "mdi-download" -->
+                                        </button>
+                                        <?php /*<button class="btn btn-danger btn-icon btn-sm" data-bs-toggle="tooltip"
+                                            title="Excluir" onclick="deleteSale(<?php echo $sale['id']; ?>)">
+                                        <i class="mdi mdi-delete"></i>
+                                        </button> */?>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
 
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-between align-items-center mt-4">
-                        <p class="text-muted mb-0">
-                            Mostrando <?php echo ($offset + 1); ?> até
-                            <?php echo min($offset + $per_page, $total_sales); ?> de <?php echo $total_sales; ?>
-                            registros
-                        </p>
-                        <nav>
-                            <ul class="pagination pagination-rounded">
-                                <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
-                                    <a class="page-link" href="?page=<?php echo $page - 1; ?>">
-                                        <i class="mdi mdi-chevron-left"></i>
-                                    </a>
-                                </li>
-                                <?php for($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++): ?>
-                                <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                                    <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                                </li>
-                                <?php endfor; ?>
-                                <li class="page-item <?php echo $page >= $total_pages ? 'disabled' : ''; ?>">
-                                    <a class="page-link" href="?page=<?php echo $page + 1; ?>">
-                                        <i class="mdi mdi-chevron-right"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-3">
+                    <div class="text-muted">
+                        Mostrando <span class="fw-medium"><?php echo ($offset + 1); ?></span> até
+                        <span class="fw-medium"><?php echo min($offset + $per_page, $total_sales); ?></span> de
+                        <span class="fw-medium"><?php echo $total_sales; ?></span> registros
                     </div>
+                    <nav>
+                        <ul class="pagination pagination-rounded mb-0">
+                            <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+                                <a class="page-link" href="?page=<?php echo $page - 1; ?>">
+                                    <i class="mdi mdi-chevron-left"></i>
+                                </a>
+                            </li>
+                            <?php for($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++): ?>
+                            <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
+                                <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                            </li>
+                            <?php endfor; ?>
+                            <li class="page-item <?php echo $page >= $total_pages ? 'disabled' : ''; ?>">
+                                <a class="page-link" href="?page=<?php echo $page + 1; ?>">
+                                    <i class="mdi mdi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
@@ -677,6 +705,16 @@ $products = get_all_products();
 
     function printReceipt(saleId) {
         window.open('print_receipt.php?id=' + saleId, /*'_blank'*/ );
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    });
+
+    function exportPDF(saleId) {
+        window.open('export_sale_pdf.php?id=' + saleId, '_blank');
     }
     </script>
     <?php include '../includes/footer.php'; ?>

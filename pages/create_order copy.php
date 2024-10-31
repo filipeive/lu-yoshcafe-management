@@ -1,5 +1,4 @@
 <?php
-// Arquivo: create_order.php
 require_once '../config/config.php';
 require_login();
 $table_id = isset($_GET['table_id']) ? intval($_GET['table_id']) : 0;
@@ -22,7 +21,6 @@ if ($table_id > 0) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $products = $_POST['products'];
     $quantities = $_POST['quantities'];
-    
     $order_id = order_create($table_ids);
     
     foreach ($table_ids as $table_id) {
@@ -41,266 +39,194 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     exit;
 }
 
-// Obter produtos disponíveis agrupados por categoria
-$stmt = $pdo->query("SELECT p.*, c.name as category_name 
-                     FROM products p 
-                     LEFT JOIN categories c ON p.category_id = c.id 
-                     WHERE p.active = 1 
-                     ORDER BY c.name, p.name");
-$products_by_category = [];
-while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $category = $product['category_name'] ?? 'Sem Categoria';
-    if (!isset($products_by_category[$category])) {
-        $products_by_category[$category] = [];
-    }
-    $products_by_category[$category][] = $product;
-}
-
+$products = product_get_available();
+$categories = []; // Adicione aqui a lógica para buscar categorias
 include '../includes/header.php';
 ?>
-
-<section class="section">
-    <div class="section-header">
-        <h1>Criar Novo Pedido</h1>
-        <div class="section-header-breadcrumb">
-            <div class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></div>
-            <div class="breadcrumb-item">Criar Pedido</div>
-        </div>
-    </div>
-
-    <div class="section-body">
-        <div class="row">
-            <!-- Lista de Produtos -->
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Produtos Disponíveis</h4>
-                        <div class="card-header-form">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="searchProducts" placeholder="Buscar produtos...">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-primary"><i class="fas fa-search"></i></button>
-                                </div>
-                            </div>
+<head>
+    <link rel="stylesheet" href="assets/order.css">
+</head>
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="card-title mb-0">Novo Pedido</h4>
+                        <div class="badge badge-primary">
+                            Mesa: <?php echo implode(', ', $table_ids); ?>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <form method="post" id="orderForm">
-                            <div class="row mb-4">
-                                <div class="col-12">
-                                    <div class="alert alert-info">
-                                        Mesa(s): <?php echo implode(', ', $table_ids); ?>
+
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <!-- Barra de busca -->
+                            <div class="form-group search-field">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-transparent">
+                                            <i class="mdi mdi-magnify"></i>
+                                        </span>
                                     </div>
+                                    <input type="text" class="form-control" id="searchProducts" placeholder="Buscar produtos...">
                                 </div>
                             </div>
 
-                            <?php foreach ($products_by_category as $category => $products): ?>
-                            <div class="products-category">
-                                <h6 class="bg-light p-2 mb-3 rounded">
-                                    <i class="fas fa-tags"></i> <?php echo htmlspecialchars($category); ?>
-                                </h6>
-                                <div class="row product-list">
+                            <!-- Categorias -->
+                            <div class="category-pills">
+                                <div class="category-pill active">Todos</div>
+                                <?php foreach ($categories as $category): ?>
+                                    <div class="category-pill"><?php echo $category['name']; ?></div>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <!-- Lista de Produtos -->
+                            <form method="post" id="orderForm">
+                                <input type="hidden" name="table_id" value="<?php echo $table_id; ?>">
+                                
+                                <div class="row">
                                     <?php foreach ($products as $product): ?>
-                                    <div class="col-md-6 col-lg-4 mb-3 product-item">
-                                        <div class="card card-primary">
-                                            <div class="card-body">
-                                                <div class="product-details">
-                                                    <h6 class="product-name">
-                                                        <?php echo htmlspecialchars($product['name']); ?>
-                                                    </h6>
-                                                    <p class="text-muted">
-                                                        R$ <?php echo number_format($product['price'], 2, ',', '.'); ?>
-                                                    </p>
-                                                </div>
-                                                <div class="quantity-controls">
-                                                    <div class="input-group">
-                                                        <div class="input-group-prepend">
-                                                            <button type="button" class="btn btn-secondary btn-decrease">
-                                                                <i class="fas fa-minus"></i>
-                                                            </button>
+                                        <div class="col-12 grid-margin" data-category="<?php echo $product['category_id']; ?>">
+                                            <div class="card product-card">
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <h5 class="card-title mb-1"><?php echo $product['name']; ?></h5>
+                                                            <p class="text-muted mb-0">MZN <?php echo number_format($product['price'], 2, ',', '.'); ?></p>
                                                         </div>
-                                                        <input type="hidden" name="products[]" value="<?php echo $product['id']; ?>">
-                                                        <input type="number" name="quantities[]" 
-                                                               class="form-control text-center quantity-input" 
-                                                               value="0" min="0" 
-                                                               data-price="<?php echo $product['price']; ?>">
-                                                        <div class="input-group-append">
-                                                            <button type="button" class="btn btn-secondary btn-increase">
-                                                                <i class="fas fa-plus"></i>
+                                                        <div class="quantity-control">
+                                                            <button type="button" class="btn btn-icon btn-outline-secondary quantity-btn decrease">
+                                                                <i class="mdi mdi-minus"></i>
                                                             </button>
+                                                            <input type="number" name="quantities[]" class="form-control quantity-input" value="0" min="0">
+                                                            <button type="button" class="btn btn-icon btn-outline-secondary quantity-btn increase">
+                                                                <i class="mdi mdi-plus"></i>
+                                                            </button>
+                                                            <input type="hidden" name="products[]" value="<?php echo $product['id']; ?>">
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
                                     <?php endforeach; ?>
                                 </div>
-                            </div>
-                            <?php endforeach; ?>
-                        </form>
-                    </div>
-                </div>
-            </div>
+                            </form>
+                        </div>
 
-            <!-- Resumo do Pedido -->
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Resumo do Pedido</h4>
-                    </div>
-                    <div class="card-body">
-                        <div id="orderSummary">
-                            <div class="alert alert-light">
-                                Selecione os produtos para criar o pedido
+                        <!-- Resumo do Pedido -->
+                        <div class="col-lg-4">
+                            <div class="card order-summary">
+                                <div class="card-body">
+                                    <h4 class="card-title">Resumo do Pedido</h4>
+                                    <div id="orderItems" class="mb-4">
+                                        <!-- Items serão adicionados via JavaScript -->
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <h4 class="mb-0">Total:</h4>
+                                        <h3 class="text-success mb-0">MZN <span id="totalPrice">0,00</span></h3>
+                                    </div>
+                                    <button type="submit" form="orderForm" class="btn btn-primary btn-lg btn-block mb-2">
+                                        <i class="mdi mdi-check-circle"></i> Confirmar Pedido
+                                    </button>
+                                    <a href="tables.php" class="btn btn-outline-secondary btn-lg btn-block">
+                                        <i class="mdi mdi-close-circle"></i> Cancelar
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                        <div class="total-section">
-                            <h5 class="text-right">
-                                Total: R$ <span id="orderTotal">0,00</span>
-                            </h5>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-whitesmoke">
-                        <button type="submit" form="orderForm" class="btn btn-primary btn-lg btn-block">
-                            <i class="fas fa-check-circle"></i> Criar Pedido
-                        </button>
-                        <a href="tables.php" class="btn btn-light btn-lg btn-block mt-2">
-                            <i class="fas fa-times"></i> Cancelar
-                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
-
-<style>
-.product-item .card {
-    transition: all 0.3s ease;
-    border: 1px solid #e4e6fc;
-}
-
-.product-item .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.quantity-controls .input-group {
-    width: 120px;
-    margin: 0 auto;
-}
-
-.product-name {
-    margin-bottom: 5px;
-    font-size: 0.9rem;
-    font-weight: 600;
-}
-
-.quantity-input {
-    height: 35px;
-}
-
-.btn-decrease, .btn-increase {
-    padding: 0.375rem 0.75rem;
-}
-
-.products-category {
-    margin-bottom: 2rem;
-}
-
-.product-details {
-    text-align: center;
-    margin-bottom: 1rem;
-}
-</style>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Busca de produtos
-    const searchInput = document.getElementById('searchProducts');
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        document.querySelectorAll('.product-item').forEach(item => {
-            const productName = item.querySelector('.product-name').textContent.toLowerCase();
-            item.style.display = productName.includes(searchTerm) ? '' : 'none';
-        });
-    });
-
-    // Controles de quantidade
-    document.querySelectorAll('.btn-decrease').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const input = this.parentElement.parentElement.querySelector('.quantity-input');
-            if (input.value > 0) {
-                input.value = parseInt(input.value) - 1;
-                input.dispatchEvent(new Event('change'));
-            }
-        });
-    });
-
-    document.querySelectorAll('.btn-increase').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const input = this.parentElement.parentElement.querySelector('.quantity-input');
-            input.value = parseInt(input.value) + 1;
-            input.dispatchEvent(new Event('change'));
-        });
-    });
-
-    // Atualizar resumo do pedido
+    // Função para atualizar o resumo do pedido
     function updateOrderSummary() {
-        const summary = document.getElementById('orderSummary');
-        const total = document.getElementById('orderTotal');
-        let totalValue = 0;
-        let summaryHTML = '';
+        const orderItems = document.getElementById('orderItems');
+        const totalPriceElement = document.getElementById('totalPrice');
+        let total = 0;
+        orderItems.innerHTML = '';
 
-        document.querySelectorAll('.quantity-input').forEach(input => {
-            const quantity = parseInt(input.value);
+        document.querySelectorAll('.product-card').forEach(card => {
+            const quantity = parseInt(card.querySelector('.quantity-input').value);
             if (quantity > 0) {
-                const price = parseFloat(input.dataset.price);
-                const productName = input.closest('.card').querySelector('.product-name').textContent;
-                const itemTotal = quantity * price;
-                totalValue += itemTotal;
+                const name = card.querySelector('.card-title').textContent;
+                const price = parseFloat(card.querySelector('.text-muted').textContent
+                    .replace('MZN ', '').replace(',', '.'));
+                const itemTotal = price * quantity;
+                total += itemTotal;
 
-                summaryHTML += `
-                    <div class="d-flex justify-content-between align-items-center mb-2">
+                orderItems.innerHTML += `
+                    <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
-                            <strong>${productName}</strong><br>
-                            <small class="text-muted">${quantity}x R$ ${price.toFixed(2)}</small>
+                            <span class="text-primary">${quantity}x</span> ${name}
                         </div>
-                        <div>R$ ${itemTotal.toFixed(2)}</div>
+                        <div class="text-muted">MZN ${itemTotal.toFixed(2).replace('.', ',')}</div>
                     </div>
                 `;
             }
         });
 
-        summary.innerHTML = summaryHTML || `
-            <div class="alert alert-light">
-                Selecione os produtos para criar o pedido
-            </div>
-        `;
-        
-        total.textContent = totalValue.toFixed(2).replace('.', ',');
+        totalPriceElement.textContent = total.toFixed(2).replace('.', ',');
     }
 
-    // Atualizar ao mudar quantidades
-    document.querySelectorAll('.quantity-input').forEach(input => {
-        input.addEventListener('change', updateOrderSummary);
+    // Manipuladores de eventos para os botões de quantidade
+    document.querySelectorAll('.quantity-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const input = this.parentNode.querySelector('.quantity-input');
+            let value = parseInt(input.value);
+
+            if (this.classList.contains('decrease')) {
+                value = Math.max(0, value - 1);
+            } else {
+                value++;
+            }
+
+            input.value = value;
+            updateOrderSummary();
+            
+            const card = this.closest('.product-card');
+            card.classList.toggle('selected', value > 0);
+        });
     });
 
-    // Validação do formulário
-    document.getElementById('orderForm').addEventListener('submit', function(e) {
-        const hasProducts = Array.from(document.querySelectorAll('.quantity-input'))
-            .some(input => parseInt(input.value) > 0);
+    // Busca de produtos
+    document.getElementById('searchProducts').addEventListener('input', function(e) {
+        const search = e.target.value.toLowerCase();
+        document.querySelectorAll('.product-card').forEach(card => {
+            const parent = card.closest('.grid-margin');
+            const name = card.querySelector('.card-title').textContent.toLowerCase();
+            parent.style.display = name.includes(search) ? 'block' : 'none';
+        });
+    });
 
-        if (!hasProducts) {
-            e.preventDefault();
-            Swal.fire({
-                title: 'Atenção',
-                text: 'Selecione pelo menos um produto para criar o pedido',
-                icon: 'warning',
-                confirmButtonText: 'Ok'
+    // Filtro por categoria
+    document.querySelectorAll('.category-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+            document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            
+            const category = this.textContent;
+            document.querySelectorAll('[data-category]').forEach(item => {
+                if (category === 'Todos' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
             });
-        }
+        });
+    });
+
+    // Atualizar quando quantidade é digitada manualmente
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        input.addEventListener('input', function() {
+            updateOrderSummary();
+            this.closest('.product-card').classList.toggle('selected', parseInt(this.value) > 0);
+        });
     });
 });
 </script>

@@ -64,152 +64,235 @@ include '../includes/header.php';
     border-color: #4B49AC;
     box-shadow: 0 0 0 0.2rem rgba(75, 73, 172, 0.25);
 }
-</style>
 
-<div class="content-wrapper">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title mb-0">Gerenciar Produtos</h4><br>
-                    <div class="d-flex justify-content-space-around align-items-center mb-4">
-                        <button type="button" class="btn btn-primary btn-sm btn-icon-text" data-toggle="modal"
-                            data-target="#addProductModal">
-                            <i class="ti-plus btn-icon-prepend"></i>
-                            Adicionar Produto
+/* Estilos personalizados */
+.card {
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.shadow-hover:hover {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+.product-card {
+    border: 1px solid rgba(0,0,0,.125);
+}
+
+.product-card:hover {
+    border-color: #0d6efd;
+}
+
+.badge-stock {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    color: white;
+}
+
+.btn-group .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.btn-group .btn i {
+    font-size: 0.875rem;
+}
+
+.page-link {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.input-group-text {
+    padding: 0.25rem 0.5rem;
+}
+
+.form-control-sm, .form-select-sm {
+    font-size: 0.875rem;
+}
+
+.alert {
+    border-radius: 0.375rem;
+}
+
+.badge {
+    font-weight: normal;
+}
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <!-- Header Section -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h4 class="card-title d-flex align-items-center gap-2 mb-1">
+                            <i class="ti-package text-primary"></i>
+                            Gerenciamento de Produtos
+                        </h4>
+                        <p class="text-muted small mb-0">Total: <?php echo count($products); ?> produtos</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-primary btn-sm d-flex align-items-center gap-1"
+                            data-toggle="modal" data-target="#addProductModal">
+                            <i class="ti-plus"></i>
+                            <span>Produto</span>
                         </button>
-                        <button type="button" class="btn btn-warning btn-sm btn-icon-text" data-toggle="modal"
-                            data-target="#addCategoryModal">
-                            <i class="ti-plus btn-icon-prepend"></i>
-                            Adicionar Nova Categoria
+                        <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
+                            data-toggle="modal" data-target="#addCategoryModal">
+                            <i class="ti-tag"></i>
+                            <span>Categoria</span>
                         </button>
                     </div>
+                </div>
 
-                    <!-- Filtros em Card Separado -->
-                    <div class="card bg-light mb-4">
-                        <div class="card-body py-3">
-                            <form class="row g-3" method="GET" action="">
-                                <div class="col-md-5">
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-primary text-white">
-                                            <i class="ti-search"></i>
-                                        </span>
-                                        <input type="text" class="form-control" name="search"
-                                            placeholder="Pesquisar produto"
-                                            value="<?php echo htmlspecialchars($searchTerm); ?>">
-                                    </div>
+                <!-- Filtros -->
+                <div class="card bg-light border-0 rounded-3 mb-3">
+                    <div class="card-body py-2">
+                        <form class="row g-2" method="GET" action="">
+                            <div class="col-md-5">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text border-0 bg-transparent">
+                                        <i class="ti-search text-muted"></i>
+                                    </span>
+                                    <input type="text" class="form-control form-control-sm border-0" name="search"
+                                        placeholder="Buscar produtos..."
+                                        value="<?php echo htmlspecialchars($searchTerm); ?>">
                                 </div>
-                                <div class="col-md-5">
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-primary text-white">
-                                            <i class="ti-filter"></i>
-                                        </span>
-                                        <select class="form-select" name="category">
-                                            <option value="">Todas as Categorias</option>
-                                            <?php foreach ($categories as $category): ?>
-                                            <option value="<?php echo $category['id']; ?>"
-                                                <?php echo $category['id'] == $categoryFilter ? 'selected' : ''; ?>>
-                                                <?php echo htmlspecialchars($category['name']); ?>
-                                            </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text border-0 bg-transparent">
+                                        <i class="ti-layers text-muted"></i>
+                                    </span>
+                                    <select class="form-select form-select-sm border-0" name="category">
+                                        <option value="">Todas as Categorias</option>
+                                        <?php foreach ($categories as $category): ?>
+                                        <option value="<?php echo $category['id']; ?>"
+                                            <?php echo $category['id'] == $categoryFilter ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($category['name']); ?>
+                                        </option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
-                                <div class="col-md-2">
-                                    <button type="submit" class="btn btn-primary w-100">
-                                        Filtrar
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                    <i class="ti-filter me-1"></i>Filtrar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Grid de Produtos -->
+                <div class="row g-2">
+                    <?php if (count($products) > 0): ?>
+                    <?php foreach ($products as $product): ?>
+                    <div class="col-6 col-md-4 col-lg-4">
+                        <div class="card product-card h-100 border shadow-hover">
+                            <div class="position-relative">
+                                <?php if ($product['image_path'] || $product['image_path']): ?>
+                                <img src="<?php echo htmlspecialchars('../uploads/' . 
+                                                    ($product['image_path'] ? 'products/' . $product['image_path'] : 
+                                                    'menu/' . $product['image_path'])); ?>" class="card-img-top"
+                                    alt="<?php echo htmlspecialchars($product['name']); ?>"
+                                    style="height: 120px; object-fit: cover;">
+                                <?php else: ?>
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                    style="height: 120px;">
+                                    <i class="ti-image text-muted" style="font-size: 2rem;"></i>
+                                </div>
+                                <?php endif; ?>
+
+                                <!-- Stock Badge -->
+                                <div class="position-absolute top-0 end-0 m-1">
+                                    <span class="badge-stock <?php echo $product['stock_quantity'] > 10 ? 'bg-success' : 
+                                                    ($product['stock_quantity'] > 5 ? 'bg-warning' : 'bg-danger'); ?>">
+                                        <?php echo $product['stock_quantity']; ?>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="card-body p-2">
+                                <!-- Category Badge -->
+                                <span class="badge bg-primary bg-opacity-10 text-primary mb-1 rounded-pill">
+                                    <i class="ti-tag me-1"></i>
+                                    <?php echo htmlspecialchars($product['category_name']); ?>
+                                </span>
+
+                                <h6 class="card-title mb-2 text-truncate"
+                                    title="<?php echo htmlspecialchars($product['name']); ?>">
+                                    <?php echo htmlspecialchars($product['name']); ?>
+                                </h6>
+
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold text-success">
+                                        MZN <?php echo number_format($product['price'], 2, ',', '.'); ?>
+                                    </span>
+                                </div>
+
+                                <div class="btn-group btn-group-sm w-100">
+                                    <button class="btn btn-outline-secondary btn-sm"
+                                        onclick="editProduct(<?php echo $product['id']; ?>)" title="Editar">
+                                        <i class="ti-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm"
+                                        onclick="updateStock(<?php echo $product['id']; ?>)" title="Atualizar Estoque">
+                                        <i class="ti-package"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm"
+                                        onclick="deleteProduct(<?php echo $product['id']; ?>)" title="Excluir">
+                                        <i class="ti-trash"></i>
                                     </button>
                                 </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Grid de Produtos -->
-                    <div class="row">
-                        <?php if (count($products) > 0): ?>
-                        <?php foreach ($products as $product): ?>
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100 product-card">
-                                <div class="position-relative">
-                                    <?php if ($product['image_path'] || $product['image_path']): ?>
-                                    <img src="<?php echo htmlspecialchars('../uploads/' . 
-                                                ($product['image_path'] ? 'products/' . $product['image_path'] : 
-                                                'menu/' . $product['image_path'])); ?>" class="card-img-top"
-                                        alt="<?php echo htmlspecialchars($product['name']); ?>"
-                                        style="height: 200px; object-fit: cover;">
-                                    <?php else: ?>
-                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
-                                        style="height: 200px;">
-                                        <i class="ti-image text-muted" style="font-size: 3rem;"></i>
-                                    </div>
-                                    <?php endif; ?>
-                                    <div class="category-badge">
-                                        <span class="badge bg-primary">
-                                            <?php echo htmlspecialchars($product['category_name']); ?>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <h5 class="card-title text-primary">
-                                        <?php echo htmlspecialchars($product['name']); ?></h5>
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <div class="price-tag">
-                                            <span class="text-muted">Preço:</span>
-                                            <span class="h5 mb-0 text-success">
-                                                MZN <?php echo number_format($product['price'], 2, ',', '.'); ?>
-                                            </span>
-                                        </div>
-                                        <div class="stock-info">
-                                            <span class="badge <?php echo $product['stock_quantity'] > 10 ? 'bg-success' : 
-                                                    ($product['stock_quantity'] > 5 ? 'bg-warning' : 'bg-danger'); ?>">
-                                                Estoque: <?php echo $product['stock_quantity']; ?>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="btn-group w-100" role="group">
-                                        <button class="btn btn-outline-warning btn-sm"
-                                            onclick="editProduct(<?php echo $product['id']; ?>)">
-                                            <i class="ti-pencil"></i> Editar
-                                        </button>
-                                        <button class="btn btn-outline-info btn-sm"
-                                            onclick="updateStock(<?php echo $product['id']; ?>)">
-                                            <i class="ti-package"></i> Estoque
-                                        </button>
-                                        <button class="btn btn-outline-danger btn-sm"
-                                            onclick="deleteProduct(<?php echo $product['id']; ?>)">
-                                            <i class="ti-trash"></i> Excluir
-                                        </button>
-                                    </div>
-                                </div>
                             </div>
                         </div>
-                        <?php endforeach; ?>
-                        <?php else: ?>
-                        <div class="col-12">
-                            <div class="alert alert-info text-center" role="alert">
-                                <i class="ti-info-circle me-2"></i> Nenhum produto encontrado.
-                            </div>
-                        </div>
-                        <?php endif; ?>
                     </div>
-
-                    <!-- Paginação -->
-                    <?php if ($totalPages > 1): ?>
-                    <nav aria-label="Page navigation" class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                            <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                                <a class="page-link"
-                                    href="?page=<?php echo $i; ?>&category=<?php echo 
-                                    htmlspecialchars($categoryFilter); ?>&search=<?php echo htmlspecialchars($searchTerm); ?>">
-                                    <?php echo $i; ?>
-                                </a>
-                            </li>
-                            <?php endfor; ?>
-                        </ul>
-                    </nav>
+                    <?php endforeach; ?>
+                    <?php else: ?>
+                    <div class="col-12">
+                        <div class="alert alert-info d-flex align-items-center py-2" role="alert">
+                            <i class="ti-info-circle me-2"></i>
+                            <small>Nenhum produto encontrado. Ajuste os filtros ou adicione novos produtos.</small>
+                        </div>
+                    </div>
                     <?php endif; ?>
                 </div>
+
+                <!-- Paginação -->
+                <?php if ($totalPages > 1): ?>
+                <nav aria-label="Navegação" class="mt-3">
+                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                        <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+                            <a class="page-link"
+                                href="?page=<?php echo $page-1; ?>&category=<?php echo 
+                                    htmlspecialchars($categoryFilter); ?>&search=<?php echo htmlspecialchars($searchTerm); ?>">
+                                <i class="ti-angle-left"></i>
+                            </a>
+                        </li>
+
+                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
+                            <a class="page-link"
+                                href="?page=<?php echo $i; ?>&category=<?php echo 
+                                    htmlspecialchars($categoryFilter); ?>&search=<?php echo htmlspecialchars($searchTerm); ?>">
+                                <?php echo $i; ?>
+                            </a>
+                        </li>
+                        <?php endfor; ?>
+
+                        <li class="page-item <?php echo $page >= $totalPages ? 'disabled' : ''; ?>">
+                            <a class="page-link"
+                                href="?page=<?php echo $page+1; ?>&category=<?php echo 
+                                    htmlspecialchars($categoryFilter); ?>&search=<?php echo htmlspecialchars($searchTerm); ?>">
+                                <i class="ti-angle-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -263,24 +346,28 @@ function deleteProduct(productId) {
     }).then((result) => {
         if (result.isConfirmed) {
             fetch('gerir_stoque/delete_product.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'id=' + productId
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showNotification('Sucesso', 'Produto excluído com sucesso!', 'success');
-                        location.reload();
-                    } else {
-                        showNotification('Erro', 'Erro ao excluir o produto.', 'error');
-                    }
-                });
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'id=' + productId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Sucesso', 'Produto excluído com sucesso!', 'success');
+                    location.reload();
+                } else {
+                    showNotification('Erro', data.message || 'Erro ao excluir o produto.', 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('Erro', 'Erro de conexão ao excluir o produto.', 'error');
+            });
         }
     });
 }
+
 
 // Função para atualizar estoque
 function updateStock(productId) {
@@ -318,45 +405,7 @@ function updateStock(productId) {
         }
     });
 }
-/*
-// Evento de submissão do formulário de adição de produto
-$('#addProductForm').on('submit', function(e) {
-    e.preventDefault();
-    $.ajax({
-        url: 'gerir_stoque/add_product.php',
-        type: 'POST',
-        data: $(this).serialize(),
-        dataType: 'json',
-        success: function(response) {
-            if (response.success) {
-                showNotification('Sucesso', 'Produto adicionado com sucesso!', 'success');
-                location.reload();
-            } else {
-                showNotification('Erro', 'Erro ao adicionar o produto.', 'error');
-            }
-        }
-    });
-});
 
-// Evento de submissão do formulário de edição de produto
-$('#editProductForm').on('submit', function(e) {
-    e.preventDefault();
-    $.ajax({
-        url: 'gerir_stoque/edit_product.php',
-        type: 'POST',
-        data: $(this).serialize(),
-        dataType: 'json',
-        success: function(response) {
-            if (response.success) {
-                showNotification('Sucesso', 'Produto atualizado com sucesso!', 'success');
-                location.reload();
-            } else {
-                showNotification('Erro', 'Erro ao atualizar o produto.', 'error');
-            }
-        }
-    });
-});
-*/
 // Função para manipular o envio do formulário de adicionar produto
 $('#addProductForm').on('submit', function(e) {
     e.preventDefault();
@@ -470,6 +519,36 @@ $('#addCategoryForm').on('submit', function(e) {
         }
     });
 });
+document.getElementById('search-input').addEventListener('keyup', function() {
+    const searchTerm = this.value;
+    const categoryFilter = ""; // Inclua o filtro de categoria, se necessário
+
+    if (searchTerm.length > 1) {
+        fetch(`products.php?search=${encodeURIComponent(searchTerm)}&category=${categoryFilter}&ajax=true`)
+            .then(response => response.json())
+            .then(data => {
+                const searchResults = document.getElementById('search-results');
+                searchResults.innerHTML = '';
+
+                if (data.length > 0) {
+                    data.forEach(product => {
+                        const item = document.createElement('div');
+                        item.textContent = product.name;
+                        item.className = 'search-result-item';
+                        searchResults.appendChild(item);
+                    });
+                    searchResults.style.display = 'block';
+                } else {
+                    searchResults.style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+    } else {
+        document.getElementById('search-results').style.display = 'none';
+    }
+});
+
 </script>
 
 <?php include '../includes/footer.php'; ?>
+</div>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 18, 2024 at 10:30 AM
+-- Generation Time: Oct 29, 2024 at 03:34 PM
 -- Server version: 8.0.39-0ubuntu0.24.04.2
 -- PHP Version: 8.3.6
 
@@ -39,7 +39,9 @@ CREATE TABLE `categories` (
 INSERT INTO `categories` (`id`, `name`) VALUES
 (1, 'Sumos'),
 (2, 'Refrescos'),
-(3, 'Comidas');
+(3, 'Comidas'),
+(4, 'Bebidas'),
+(5, 'Doces e Salgados');
 
 -- --------------------------------------------------------
 
@@ -91,7 +93,7 @@ CREATE TABLE `menus` (
 --
 
 INSERT INTO `menus` (`id`, `name`, `description`, `price`, `category`, `image_path`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'Hamburguer de Galinha', 'Com Batata', 250.00, 'Fast Food', '../uploads/menu/670ece14e08b1.png', 1, '2024-10-15 19:39:21', '2024-10-15 20:18:28');
+(1, 'Hamburguer de Galinha', 'Com Batata', 250.00, 'Fast Food', '../uploads/menu/671e45f926574.jpg', 1, '2024-10-15 19:39:21', '2024-10-27 13:54:01');
 
 -- --------------------------------------------------------
 
@@ -112,14 +114,7 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `table_id`, `status`, `total_amount`, `created_at`) VALUES
-(6, 1, 'completed', 1850.00, '2024-10-16 12:49:26'),
-(7, 1, 'completed', 1850.00, '2024-10-16 12:56:53'),
-(8, 2, 'completed', 4050.00, '2024-10-16 12:59:04'),
-(9, 2, 'completed', 4050.00, '2024-10-16 13:00:02'),
-(10, 1, 'completed', 0.00, '2024-10-16 13:11:44'),
-(11, 1, 'completed', 700.00, '2024-10-16 13:13:09'),
-(12, 3, 'completed', 700.00, '2024-10-17 10:21:21'),
-(13, 1, 'completed', 700.00, '2024-10-17 11:34:46');
+(31, 1, 'active', 3500.00, '2024-10-29 15:25:01');
 
 -- --------------------------------------------------------
 
@@ -139,31 +134,8 @@ CREATE TABLE `order_items` (
 --
 
 INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`) VALUES
-(6, 6, 1, 1),
-(7, 6, 4, 2),
-(8, 6, 2, 3),
-(9, 6, 3, 2),
-(10, 7, 1, 1),
-(11, 7, 4, 2),
-(12, 7, 2, 3),
-(13, 7, 3, 2),
-(14, 8, 1, 1),
-(15, 8, 4, 3),
-(16, 8, 2, 10),
-(17, 8, 3, 3),
-(18, 9, 1, 1),
-(19, 9, 4, 3),
-(20, 9, 2, 10),
-(21, 9, 3, 3),
-(22, 11, 1, 1),
-(23, 11, 2, 1),
-(24, 11, 2, 1),
-(25, 12, 1, 1),
-(26, 12, 2, 1),
-(27, 12, 3, 1),
-(28, 13, 1, 1),
-(29, 13, 2, 1),
-(30, 13, 3, 1);
+(1, 31, 3, 7),
+(2, 31, 3, 7);
 
 -- --------------------------------------------------------
 
@@ -177,18 +149,33 @@ CREATE TABLE `products` (
   `description` text,
   `price` decimal(10,2) NOT NULL,
   `stock_quantity` int NOT NULL DEFAULT '0',
-  `category_id` int DEFAULT NULL
+  `category_id` int DEFAULT NULL,
+  `image_path` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `menu_id` int DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `description`, `price`, `stock_quantity`, `category_id`) VALUES
-(1, 'Ceres', '1lt', 200.00, 96, 1),
-(2, 'Hamburguer de Galinha', 'Hamburguer de Galinha', 250.00, 94, 3),
-(3, 'Hamburguer de Vaca', 'com Batatas', 250.00, 100, 3),
-(4, 'Chicker Pops', 'Pipoca de Galinha', 200.00, 495, 3);
+INSERT INTO `products` (`id`, `name`, `description`, `price`, `stock_quantity`, `category_id`, `image_path`, `created_at`, `updated_at`, `menu_id`, `is_active`) VALUES
+(1, 'Ceres', '500 ml', 40.00, 31, 4, '671e344fd9d2f.jpg', '2024-10-22 16:39:57', '2024-10-29 14:49:45', NULL, 1),
+(2, 'Hamburguer de Galinha', 'Hamburguer de Galinha', 250.00, 1000, 3, '671e363d9f09c.jpg', '2024-10-22 16:39:57', '2024-10-29 14:50:49', NULL, 1),
+(3, 'Hamburguer de Vaca', 'com Batatas', 250.00, 1000, 3, '671e36714e134.jpg', '2024-10-22 16:39:57', '2024-10-29 14:51:04', NULL, 1),
+(4, 'Chicker Pops', 'Pipoca de Galinha', 250.00, 1000, 3, '671e368089202.png', '2024-10-22 16:39:57', '2024-10-29 14:50:36', NULL, 1),
+(5, 'Agua  Pequena', 'Agua Mineral de 500 ml', 30.00, 20, 4, '6720f5474e1e8.jpg', '2024-10-22 16:39:57', '2024-10-29 15:22:24', NULL, 1),
+(6, 'Sumo Compal', 'sumo 1 litro', 200.00, 30, 4, '671e38040dd35.png', '2024-10-22 17:30:46', '2024-10-29 13:26:56', NULL, 1),
+(7, 'Agua Vumba Grande', '1lt', 60.00, 10, 4, '671e320d8ef69.jpg', '2024-10-27 12:23:15', '2024-10-29 14:49:06', NULL, 1),
+(9, 'shawarma de frago', '', 220.00, 1000, 3, NULL, '2024-10-29 14:52:38', '2024-10-29 14:52:38', NULL, 1),
+(10, '1/2 de frago /c/batata/salada', '', 400.00, 1000, 3, NULL, '2024-10-29 14:54:14', '2024-10-29 14:54:14', NULL, 1),
+(11, 'salada de atum /c/batata', '', 400.00, 1000, 3, NULL, '2024-10-29 14:55:45', '2024-10-29 14:55:45', NULL, 1),
+(12, 'dose de batata', '', 100.00, 1000, 3, NULL, '2024-10-29 14:56:28', '2024-10-29 14:56:28', NULL, 1),
+(13, 'refresco', '', 50.00, 32, 4, NULL, '2024-10-29 14:57:44', '2024-10-29 15:03:00', NULL, 1),
+(14, 'cappy', '', 80.00, 38, 4, NULL, '2024-10-29 14:59:06', '2024-10-29 14:59:06', NULL, 1),
+(15, 'água tónica', '', 80.00, 15, 4, NULL, '2024-10-29 15:02:24', '2024-10-29 15:02:24', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -201,27 +188,19 @@ CREATE TABLE `sales` (
   `sale_date` datetime DEFAULT CURRENT_TIMESTAMP,
   `total_amount` decimal(10,2) NOT NULL,
   `payment_method` varchar(50) NOT NULL,
-  `status` varchar(20) DEFAULT 'completed'
+  `status` varchar(20) DEFAULT 'completed',
+  `cash_amount` decimal(10,2) DEFAULT '0.00',
+  `card_amount` decimal(10,2) DEFAULT '0.00',
+  `mpesa_amount` decimal(10,2) DEFAULT '0.00',
+  `emola_amount` decimal(10,2) DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `sales`
 --
 
-INSERT INTO `sales` (`id`, `sale_date`, `total_amount`, `payment_method`, `status`) VALUES
-(16, '2024-10-16 15:00:18', 4050.00, 'Dinheiro', 'completed'),
-(17, '2024-10-16 15:10:57', 1850.00, 'Dinheiro', 'completed'),
-(18, '2024-10-16 15:11:00', 1850.00, 'Dinheiro', 'completed'),
-(19, '2024-10-16 15:11:03', 4050.00, 'Dinheiro', 'completed'),
-(20, '2024-10-16 15:12:13', 0.00, 'Dinheiro', 'completed'),
-(21, '2024-10-16 15:34:08', 200.00, 'mpesa', 'completed'),
-(22, '2024-10-16 18:30:16', 700.00, 'Dinheiro', 'completed'),
-(23, '2024-10-17 12:15:40', 200.00, 'cash', 'completed'),
-(24, '2024-10-17 12:22:26', 700.00, 'Dinheiro', 'completed'),
-(25, '2024-10-17 13:06:52', 400.00, 'cash', 'completed'),
-(26, '2024-10-17 13:33:40', 400.00, 'cash', 'completed'),
-(27, '2024-10-17 13:35:13', 700.00, 'Dinheiro', 'completed'),
-(28, '2024-10-17 13:36:38', 200.00, 'cash', 'completed');
+INSERT INTO `sales` (`id`, `sale_date`, `total_amount`, `payment_method`, `status`, `cash_amount`, `card_amount`, `mpesa_amount`, `emola_amount`) VALUES
+(1, '2024-10-29 17:22:24', 30.00, 'Dinheiro', 'completed', 50.00, 0.00, 0.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -242,38 +221,7 @@ CREATE TABLE `sale_items` (
 --
 
 INSERT INTO `sale_items` (`id`, `sale_id`, `product_id`, `quantity`, `unit_price`) VALUES
-(16, 16, 1, 1, 200.00),
-(17, 16, 2, 10, 250.00),
-(18, 16, 3, 3, 250.00),
-(19, 16, 4, 3, 200.00),
-(20, 17, 1, 1, 200.00),
-(21, 17, 2, 3, 250.00),
-(22, 17, 3, 2, 250.00),
-(23, 17, 4, 2, 200.00),
-(24, 18, 1, 1, 200.00),
-(25, 18, 2, 3, 250.00),
-(26, 18, 3, 2, 250.00),
-(27, 18, 4, 2, 200.00),
-(28, 19, 1, 1, 200.00),
-(29, 19, 2, 10, 250.00),
-(30, 19, 3, 3, 250.00),
-(31, 19, 4, 3, 200.00),
-(32, 21, 4, 1, 200.00),
-(33, 22, 1, 1, 200.00),
-(34, 22, 2, 1, 250.00),
-(35, 22, 2, 1, 250.00),
-(36, 23, 1, 1, 200.00),
-(37, 24, 1, 1, 200.00),
-(38, 24, 2, 1, 250.00),
-(39, 24, 3, 1, 250.00),
-(40, 25, 1, 1, 200.00),
-(41, 25, 4, 1, 200.00),
-(42, 26, 1, 1, 200.00),
-(43, 26, 4, 1, 200.00),
-(44, 27, 1, 1, 200.00),
-(45, 27, 2, 1, 250.00),
-(46, 27, 3, 1, 250.00),
-(47, 28, 1, 1, 200.00);
+(1, 1, 5, 1, 30.00);
 
 -- --------------------------------------------------------
 
@@ -285,20 +233,23 @@ CREATE TABLE `tables` (
   `id` int NOT NULL,
   `number` int NOT NULL,
   `capacity` int NOT NULL,
-  `status` enum('free','occupied') DEFAULT 'free'
+  `status` enum('free','occupied') DEFAULT 'free',
+  `group_id` varchar(23) DEFAULT NULL,
+  `is_main` tinyint(1) DEFAULT '0',
+  `merged_capacity` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `tables`
 --
 
-INSERT INTO `tables` (`id`, `number`, `capacity`, `status`) VALUES
-(1, 1, 4, 'occupied'),
-(2, 2, 4, 'free'),
-(3, 3, 4, 'free'),
-(4, 4, 4, 'free'),
-(5, 5, 4, 'free'),
-(6, 6, 4, 'free');
+INSERT INTO `tables` (`id`, `number`, `capacity`, `status`, `group_id`, `is_main`, `merged_capacity`) VALUES
+(1, 1, 4, 'occupied', 'g6720fde5b4dfd', 0, NULL),
+(2, 2, 4, 'occupied', 'g6720fde5b4dfd', 0, NULL),
+(3, 3, 4, 'free', NULL, 0, NULL),
+(4, 4, 4, 'free', NULL, 0, 4),
+(5, 5, 4, 'free', NULL, 0, NULL),
+(6, 6, 4, 'free', NULL, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -370,7 +321,8 @@ ALTER TABLE `order_items`
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_menu_id` (`menu_id`);
 
 --
 -- Indexes for table `sales`
@@ -408,7 +360,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `clients`
@@ -432,31 +384,31 @@ ALTER TABLE `menus`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `sales`
 --
 ALTER TABLE `sales`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `sale_items`
 --
 ALTER TABLE `sale_items`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tables`
@@ -486,6 +438,12 @@ ALTER TABLE `orders`
 ALTER TABLE `order_items`
   ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
   ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+
+--
+-- Constraints for table `products`
+--
+ALTER TABLE `products`
+  ADD CONSTRAINT `fk_menu_id` FOREIGN KEY (`menu_id`) REFERENCES `menus` (`id`);
 
 --
 -- Constraints for table `sale_items`

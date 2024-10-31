@@ -243,7 +243,7 @@ function get_hourly_sales_data() {
                 DATE_FORMAT(sale_date, '%H:00') as hour,
                 SUM(total_amount) as total_amount
             FROM sales 
-            WHERE sale_date >= CURDATE() 
+            WHERE sale_date >= CURDATE()
             AND status != 'cancelled'
             GROUP BY hour
             ORDER BY hour

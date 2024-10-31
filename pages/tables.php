@@ -35,61 +35,144 @@ $tables = get_all_tables();
 include '../includes/header.php';
 ?>
 
+<style>
+.table-card {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    overflow: hidden; /* Para adicionar bordas arredondadas em todas as partes */
+    border: 1px solid rgba(0, 0, 0, 0.1); /* Bordas sutis */
+}
+
+.table-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* Sombra mais pronunciada */
+}
+
+.table-available {
+    background: linear-gradient(135deg, #aeeeee 0%, #e0f7fa 100%); /* Cores mais frescas para mesas livres */
+}
+
+.table-occupied {
+    background: linear-gradient(135deg, #ffe0b2 0%, #ffcc80 100%); /* Cores quentes para mesas ocupadas */
+}
+
+.table-with-order {
+    background: linear-gradient(135deg, #ffe6cc 0%, #ffab91 100%); /* Cores suaves para mesas com pedidos */
+}
+
+.table-card .card-header {
+    background-color: rgba(255, 255, 255, 0.9); /* Cabeçalho mais claro */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2); /* Borda mais visível */
+    color: #333; /* Texto mais escuro */
+}
+
+.table-meta .capacity,
+.table-meta .status {
+    font-weight: bold; /* Negrito para destaque */
+    color: #444; /* Cor do texto */
+}
+
+.table-actions .btn-group,
+.table-actions .btn-group-vertical {
+    width: 100%;
+}
+
+.table-actions .btn {
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave para os botões */
+}
+
+.table-actions .btn:hover {
+    background-color: rgba(0, 0, 0, 0.1); /* Fundo sutil ao passar o mouse */
+}
+
+</style>
+
 
 <div class="row">
-    <div class="col-lg-12 grid-margin stretch-card">
-        <div class="card">
+    <div class="col-lg-12">
+        <div class="card card-tables shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+                <h4 class="card-title mb-0">
+                    <i class="mdi mdi-table-large mr-2"></i>Gestão de Mesas
+                </h4>
+                <!--<div class="header-actions">
+                    <button type="button" class="btn btn-outline-light" data-toggle="modal"
+                        data-target="#createTableModal">
+                        <i class="mdi mdi-plus-circle-outline mr-1"></i>Adicionar Mesa
+                    </button>
+                </div>-->
+            </div>
             <div class="card-body">
-                <h4 class="my-4 card-title">Mesas</h4>
-               <!-- <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#createTableModal">
-                    Adicionar Nova Mesa
-                </button>-->
                 <div class="row">
                     <?php foreach ($tables as $table): ?>
-                    <div class="col-md-4 mb-4">
-                        <div
-                            class="card text-center <?php echo $table['real_status'] == 'livre' ? 'bg-light' : ($table['real_status'] == 'ocupada' ? 'bg-warning' : 'bg-danger'); ?>">
-                            <div class="card-body">
-                                <h5 class="card-title">Mesa <?php echo $table['number']; ?></h5>
+                    <div class="col-xl-3 col-lg-4 col-md-8 mb-4">
+                        <div class="table-card 
+                                            <?php 
+                                            $statusClass = match($table['real_status']) {
+                                                'livre' => 'table-available',
+                                                'ocupada' => 'table-occupied',
+                                                'com_pedido' => 'table-with-order',
+                                                default => 'table-default'
+                                            };
+                                            echo $statusClass;
+                                            ?> 
+                                            card overflow-hidden position-relative">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <span class="badge badge-pill badge-dark">
+                                        Mesa <?php echo $table['number']; ?>
+                                    </span>
+                                </h5>
                                 <?php if ($table['group_id']): ?>
-                                <span class="badge bg-info">Unida</span>
-                                <button type="button" class="btn btn-danger btn-sm split-table"
-                                    data-table-id="<?php echo $table['id']; ?>">
-                                    Separar Mesa
-                                </button>
+                                <span class="badge badge-info">Unida</span>
                                 <?php endif; ?>
-                                <p class="card-text">Capacidade: <?php echo $table['capacity']; ?> </p>
-                                <p
-                                    class="badge <?php echo $table['real_status'] == 'livre' ? 'bg-success' : ($table['real_status'] == 'ocupada' ? 'bg-warning' : 'bg-danger'); ?>">
-                                    <?php echo ucfirst($table['real_status']); ?>
-                                </p>
-
-                                <div class="d-flex justify-content-around flex-wrap">
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="table-meta mb-3">
+                                    <div class="capacity">
+                                        <i class="mdi mdi-seat mr-2"></i>
+                                        <?php echo $table['capacity']; ?> lugares
+                                    </div>
+                                    <div class="status mt-2">
+                                        <span class="badge 
+                                                            <?php 
+                                                            $badgeClass = match($table['real_status']) {
+                                                                'livre' => 'badge-success',
+                                                                'ocupada' => 'badge-warning',
+                                                                'com_pedido' => 'badge-info',
+                                                                default => 'badge-secondary'
+                                                            };
+                                                            echo $badgeClass;
+                                                            ?>">
+                                            <?php echo ucfirst($table['real_status']); ?>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="table-actions mt-3">
                                     <?php if ($table['real_status'] == 'livre'): ?>
-                                    <button type="button" class="btn btn-primary btn-sm occupy-table"
-                                        data-table-id="<?php echo $table['id']; ?>">
-                                        Ocupar Mesa
-                                    </button>
-                                    <button type="button" class="btn btn-warning btn-sm merge-table"
-                                        data-table-id="<?php echo $table['id']; ?>">
-                                        Unir Mesas
-                                    </button>
-                                    <?php elseif ($table['real_status'] == 'ocupada' || $table['real_status'] == 'com_pedido'): ?>
-                                    <?php if ($table['real_status'] == 'com_pedido'): ?>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-outline-primary btn-sm occupy-table"
+                                            data-table-id="<?php echo $table['id']; ?>">
+                                            <i class="mdi mdi-seat-recline-extra mr-1"></i>Ocupar
+                                        </button>
+                                        <button type="button" class="btn btn-outline-warning btn-sm merge-table"
+                                            data-table-id="<?php echo $table['id']; ?>">
+                                            <i class="mdi mdi-table-merge mr-1"></i>Unir
+                                        </button>
+                                    </div>
+                                    <?php elseif ($table['real_status'] == 'com_pedido'): ?>
                                     <a href="view_order.php?order_id=<?php echo $table['id']; ?>"
-                                        class="btn btn-info btn-sm mb-2">
-                                        Ver Pedido
+                                        class="btn btn-outline-info btn-sm mb-2">
+                                        <i class="mdi mdi-eye mr-1"></i>Ver Pedido
                                     </a>
-                                    <?php endif; ?>
-                                    <?php if ($table['real_status'] == 'ocupada' || $table['group_id']): ?>
+                                    <?php elseif ($table['real_status'] == 'ocupada'): ?>
                                     <a href="create_order.php?table_id=<?php echo $table['id']; ?>"
-                                        class="btn btn-success btn-sm mb-2">
-                                        Criar Pedido
+                                        class="btn btn-outline-success btn-sm mb-2">
+                                        <i class="mdi mdi-cart-plus mr-1"></i>Criar Pedido
                                     </a>
-                                    <?php endif; ?>
-                                    <button type="button" class="btn btn-danger btn-sm free-table"
+                                    <button type="button" class="btn btn-outline-danger btn-sm free-table"
                                         data-table-id="<?php echo $table['id']; ?>">
-                                        Liberar Mesa
+                                        <i class="mdi mdi-table-remove mr-1"></i>Liberar
                                     </button>
                                     <?php endif; ?>
                                 </div>
@@ -102,6 +185,7 @@ include '../includes/header.php';
         </div>
     </div>
 </div>
+
 <?php include "modais/modais_mesas.php" ?>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>

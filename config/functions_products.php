@@ -241,125 +241,6 @@ function ensure_upload_directory($dir) {
     }
     return is_writable($dir);
 }
-/*
-// Função para criar produto
-function create_product($name, $description, $price, $stock_quantity, $category_id, $image = null) {
-    global $pdo;
-    
-    $name = filter_var($name, FILTER_SANITIZE_STRING);
-    $description = filter_var($description, FILTER_SANITIZE_STRING);
-    $price = filter_var($price, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-    $stock_quantity = filter_var($stock_quantity, FILTER_SANITIZE_NUMBER_INT);
-    $category_id = filter_var($category_id, FILTER_SANITIZE_NUMBER_INT);
-    
-    // Verifica se é uma comida e existe no menu
-    $stmt = $pdo->prepare("SELECT c.name as category_name FROM categories c WHERE c.id = ?");
-    $stmt->execute([$category_id]);
-    $category = $stmt->fetch();
-    
-    if ($category['category_name'] === 'Comida') {
-        // Verifica se existe no menu
-        $stmt = $pdo->prepare("SELECT id, image_path FROM menus WHERE name = ?");
-        $stmt->execute([$name]);
-        $menu_item = $stmt->fetch();
-        
-        // Se existir no menu, usa a imagem do menu
-        if ($menu_item) {
-            $image_path = $menu_item['image_path'];
-        }
-    }
-    
-    // Se tiver uma nova imagem
-    if ($image && $image['error'] === UPLOAD_ERR_OK) {
-        $image_path = handle_image_upload($image, 'products');
-    }
-    
-    if (isset($image_path)) {
-        $stmt = $pdo->prepare("INSERT INTO products (name, description, price, stock_quantity, 
-                              category_id, image_path, created_at, updated_at) 
-                              VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
-        return $stmt->execute([$name, $description, $price, $stock_quantity, $category_id, $image_path]);
-    } else {
-        $stmt = $pdo->prepare("INSERT INTO products (name, description, price, stock_quantity, 
-                              category_id, created_at, updated_at) 
-                              VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
-        return $stmt->execute([$name, $description, $price, $stock_quantity, $category_id]);
-    }
-}
-// Função para atualizar produto
-function update_product($id, $name, $description, $price, $stock_quantity, $category_id, $image = null) {
-    global $pdo;
-    
-    $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
-    $name = filter_var($name, FILTER_SANITIZE_STRING);
-    $description = filter_var($description, FILTER_SANITIZE_STRING);
-    $price = filter_var($price, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-    $stock_quantity = filter_var($stock_quantity, FILTER_SANITIZE_NUMBER_INT);
-    $category_id = filter_var($category_id, FILTER_SANITIZE_NUMBER_INT);
-    
-    // Verifica se é uma comida e existe no menu
-    $stmt = $pdo->prepare("SELECT c.name as category_name FROM categories c WHERE c.id = ?");
-    $stmt->execute([$category_id]);
-    $category = $stmt->fetch();
-    
-    if ($category['category_name'] === 'Comida') {
-        // Verifica se existe no menu
-        $stmt = $pdo->prepare("SELECT id, image_path FROM menus WHERE name = ?");
-        $stmt->execute([$name]);
-        $menu_item = $stmt->fetch();
-        
-        // Se existir no menu, usa a imagem do menu
-        if ($menu_item) {
-            $image_path = $menu_item['image_path'];
-        }
-    }
-    
-    // Se tiver uma nova imagem
-    if ($image && $image['error'] === UPLOAD_ERR_OK) {
-        $image_path = handle_image_upload($image, 'products');
-    }
-    
-    if (isset($image_path)) {
-        $stmt = $pdo->prepare("UPDATE products SET name = ?, description = ?, price = ?, 
-                              stock_quantity = ?, category_id = ?, image_path = ?, 
-                              updated_at = CURRENT_TIMESTAMP WHERE id = ?");
-        return $stmt->execute([$name, $description, $price, $stock_quantity, $category_id, $image_path, $id]);
-    } else {
-        $stmt = $pdo->prepare("UPDATE products SET name = ?, description = ?, price = ?, 
-                              stock_quantity = ?, category_id = ?, 
-                              updated_at = CURRENT_TIMESTAMP WHERE id = ?");
-        return $stmt->execute([$name, $description, $price, $stock_quantity, $category_id, $id]);
-    }
-}
-*/
-// Função auxiliar para manipular upload de imagens
-/*
-function handle_image_upload($image, $folder) {
-    $target_dir = "uploads/" . $folder . "/";
-    
-    // Cria o diretório se não existir
-    if (!file_exists($target_dir)) {
-        mkdir($target_dir, 0777, true);
-    }
-    
-    // Gera um nome único para o arquivo
-    $file_extension = strtolower(pathinfo($image['name'], PATHINFO_EXTENSION));
-    $file_name = uniqid() . '.' . $file_extension;
-    $target_file = $target_dir . $file_name;
-    
-    // Verifica o tipo de arquivo
-    $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
-    if (!in_array($file_extension, $allowed_types)) {
-        throw new Exception('Tipo de arquivo não permitido');
-    }
-    
-    // Move o arquivo para o diretório de destino
-    if (move_uploaded_file($image['tmp_name'], $target_file)) {
-        return $file_name;
-    } else {
-        throw new Exception('Erro ao fazer upload da imagem');
-    }
-}*/
 
 function get_all_products() {
     global $pdo;
@@ -489,3 +370,36 @@ function get_products_image() {
     $stmt = $pdo->query("SELECT id, name, image_path FROM products");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+/*
+// Função para buscar produtos com paginação
+function get_filtered_products($categoryFilter, $searchTerm, $limit, $offset) {
+    global $pdo;
+    $query = "SELECT p.id, p.name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE 1=1";
+
+    if ($categoryFilter) {
+        $query .= " AND c.id = :category_id";
+    }
+
+    if ($searchTerm) {
+        $query .= " AND p.name LIKE :search";
+    }
+
+    $query .= " LIMIT :limit OFFSET :offset";
+    
+    $stmt = $pdo->prepare($query);
+    
+    if ($categoryFilter) {
+        $stmt->bindValue(':category_id', $categoryFilter, PDO::PARAM_INT);
+    }
+
+    if ($searchTerm) {
+        $stmt->bindValue(':search', '%' . $searchTerm . '%', PDO::PARAM_STR);
+    }
+
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+*/

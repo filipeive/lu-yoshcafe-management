@@ -10,29 +10,29 @@ $categoryFilter = isset($_GET['category']) ? $_GET['category'] : null;
 $searchTerm = isset($_GET['search']) ? $_GET['search'] : null;
 $category_id = $categoryFilter;
 $totalProducts = count_filtered_products($categoryFilter, $searchTerm);
-$limit = 12; // Aumentado para melhor grid layout
+$limit = 12;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
 $products = get_filtered_products($categoryFilter, $searchTerm, $limit, $offset);
-//$products_image = get_products_image($product_id, $products);
-
 ?>
 
 <head>
     <link rel="stylesheet" href="assets/pos.css">
 </head>
+
 <div class="pos-wrapper">
-    <div class="row">
-        <!-- Área de Produtos -->
+    <div class="row g-4">
+        <!-- Products Area -->
         <div class="col-lg-8">
-            <div class="mb-4">
+            <div class="search-section">
                 <div class="d-flex gap-3 align-items-center">
-                    <div class="flex-grow-1">
-                        <input type="text" class="form-control form-control-lg" placeholder="Pesquisar produtos..."
+                    <div class="flex-grow-1 search-input-wrapper">
+                        <i class="mdi mdi-magnify"></i>
+                        <input type="text" class="form-control search-input" placeholder="Pesquisar produtos..."
                             id="searchInput" onkeyup="filterProducts()">
                     </div>
-                    <select id="categorySelect" class="form-select form-select-lg" style="width: auto;"
+                    <select id="categorySelect" class="form-select search-input" style="width: auto;"
                         onchange="filterProducts()">
                         <option value="">Todas as Categorias</option>
                         <?php foreach ($categories as $category): ?>
@@ -45,10 +45,12 @@ $products = get_filtered_products($categoryFilter, $searchTerm, $limit, $offset)
             </div>
 
             <div class="category-filters">
-                <button class="category-btn active" data-category="all">Todos</button>
+                <button class="category-btn active" data-category="all">
+                    <i class="mdi mdi-view-grid"></i>Todos
+                </button>
                 <?php foreach ($categories as $category): ?>
                 <button class="category-btn" data-category="<?php echo $category['id']; ?>">
-                    <?php echo htmlspecialchars($category['name']); ?>
+                    <i class="mdi mdi-tag"></i><?php echo htmlspecialchars($category['name']); ?>
                 </button>
                 <?php endforeach; ?>
             </div>
@@ -58,11 +60,15 @@ $products = get_filtered_products($categoryFilter, $searchTerm, $limit, $offset)
                 <div class="col-md-3 product-item" data-category="<?php echo $product['category_id']; ?>">
                     <div class="product-card"
                         onclick="addToCart(<?php echo htmlspecialchars(json_encode($product)); ?>)">
-                        <img src="<?php echo $product['image_path'] ?: '../public/assets/images/restaurant-bg.jpg'; ?>"
-                            class="card-img-top" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                        <div class="product-icon">
+                            <i class="mdi mdi-food"></i>
+                        </div>
                         <div class="card-body">
                             <h5 class="card-title"><?php echo htmlspecialchars($product['name']); ?></h5>
-                            <p class="price">MZN <?php echo number_format($product['price'], 2); ?></p>
+                            <p class="price">
+                                <i class="mdi mdi-currency-usd"></i>
+                                MZN <?php echo number_format($product['price'], 2); ?>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -70,12 +76,15 @@ $products = get_filtered_products($categoryFilter, $searchTerm, $limit, $offset)
             </div>
         </div>
 
-        <!-- Área do Carrinho -->
+        <!-- Cart Area -->
         <div class="col-lg-4">
             <div class="cart-wrapper">
                 <div class="cart-header">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0">Pedido Atual</h4>
+                        <h4 class="mb-0">
+                            <i class="mdi mdi-cart"></i>
+                            Pedido Atual
+                        </h4>
                         <button class="btn btn-outline-danger btn-sm" onclick="resetSale()">
                             <i class="mdi mdi-delete"></i> Limpar
                         </button>
@@ -83,7 +92,7 @@ $products = get_filtered_products($categoryFilter, $searchTerm, $limit, $offset)
                 </div>
 
                 <div class="cart-items" id="cartItems">
-                    <!-- Items serão adicionados via JavaScript -->
+                    <!-- Items will be added via JavaScript -->
                 </div>
 
                 <div class="p-3 border-top">
@@ -97,13 +106,15 @@ $products = get_filtered_products($categoryFilter, $searchTerm, $limit, $offset)
                     </div>
                 </div>
 
-                <!-- Métodos de Pagamento -->
                 <div class="payment-methods">
-                    <h5 class="mb-3">Método de Pagamento</h5>
+                    <h5 class="mb-3">
+                        <i class="mdi mdi-credit-card-outline me-2"></i>
+                        Método de Pagamento
+                    </h5>
                     <div class="row g-3">
                         <div class="col-6">
                             <div class="payment-card" onclick="selectPayment('cash')">
-                                <img src="../public/images/payment/cash.png" alt="Dinheiro">
+                                <i class="mdi mdi-cash"></i>
                                 <h6 class="mb-2">Dinheiro</h6>
                                 <input type="number" class="form-control form-control-sm" id="cashAmount"
                                     placeholder="0.00" onchange="calculateChange()">
@@ -111,7 +122,7 @@ $products = get_filtered_products($categoryFilter, $searchTerm, $limit, $offset)
                         </div>
                         <div class="col-6">
                             <div class="payment-card" onclick="selectPayment('card')">
-                                <img src="../public/images/payment/pos.png" alt="Cartão">
+                                <i class="mdi mdi-credit-card"></i>
                                 <h6 class="mb-2">Cartão</h6>
                                 <input type="number" class="form-control form-control-sm" id="cardAmount"
                                     placeholder="0.00" onchange="calculateChange()">
@@ -119,7 +130,7 @@ $products = get_filtered_products($categoryFilter, $searchTerm, $limit, $offset)
                         </div>
                         <div class="col-6">
                             <div class="payment-card" onclick="selectPayment('mpesa')">
-                                <img src="../public/images/payment/M-Pesa.jpg" alt="M-Pesa">
+                                <i class="mdi mdi-phone"></i>
                                 <h6 class="mb-2">M-Pesa</h6>
                                 <input type="number" class="form-control form-control-sm" id="mpesaAmount"
                                     placeholder="0.00" onchange="calculateChange()">
@@ -127,7 +138,7 @@ $products = get_filtered_products($categoryFilter, $searchTerm, $limit, $offset)
                         </div>
                         <div class="col-6">
                             <div class="payment-card" onclick="selectPayment('emola')">
-                                <img src="../public/images/payment/emola.png" alt="E-mola">
+                                <i class="mdi mdi-wallet"></i>
                                 <h6 class="mb-2">E-mola</h6>
                                 <input type="number" class="form-control form-control-sm" id="emolaAmount"
                                     placeholder="0.00" onchange="calculateChange()">
@@ -135,19 +146,25 @@ $products = get_filtered_products($categoryFilter, $searchTerm, $limit, $offset)
                         </div>
                     </div>
 
-                    <div class="mt-3">
-                        <label class="form-label">Troco:</label>
-                        <input type="text" class="form-control" id="changeAmount" readonly>
+                    <div class="mt-4">
+                        <div class="change-section p-3 bg-light rounded-3 border">
+                            <label class="form-label d-flex align-items-center gap-2">
+                                <i class="mdi mdi-cash-refund text-success"></i>
+                                <span>Troco:</span>
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="changeAmount" readonly>
+                        </div>
                     </div>
                 </div>
 
-                <div class="action-buttons p-3">
+                <div class="action-buttons">
                     <button id="btnFinalizeOrder" class="btn-finalize" onclick="processSale()">
-                        <i class="mdi mdi-check-circle"></i> Finalizar Pedido
+                        <i class="mdi mdi-check-circle-outline"></i>
+                        Finalizar Pedido
                     </button>
-
                     <button class="btn-preview" onclick="previewReceipt()">
-                        <i class="mdi mdi-printer"></i> Pré-visualizar Recibo
+                        <i class="mdi mdi-printer"></i>
+                        Pré-visualizar Recibo
                     </button>
                 </div>
             </div>

@@ -1,11 +1,16 @@
 <?php
 require_once '../config/config.php';
+
+// Verifica se o ID da venda foi fornecido
 if (!isset($_GET['id'])) {
     die('ID da venda não fornecido');
 }
+
 $sale_id = filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT);
 $sale = get_sale($sale_id);
 $sale_items = get_sale_items($sale_id);
+
+// Verifica se a venda existe
 if (!$sale) {
     die('Venda não encontrada');
 }
@@ -22,12 +27,12 @@ $change = max(0, $total_paid - $sale['total_amount']);
     <title>Recibo da Venda #<?php echo $sale_id; ?></title>
     <style>
     @page {
-        size: 58mm auto;
+        size: 56mm auto;
         margin: 0;
     }
 
     body {
-        font-family: 'Courier New', monospace;
+        font-family: 'Arial';
         font-size: 12px;
         width: 58mm;
         margin: 0 auto;
@@ -42,7 +47,8 @@ $change = max(0, $total_paid - $sale['total_amount']);
     }
 
     .header img {
-        max-width: 120px;
+        max-width: 100px;
+        margin-bottom: -10px;
     }
 
     .divider {
@@ -50,21 +56,38 @@ $change = max(0, $total_paid - $sale['total_amount']);
         margin: 8px 0;
     }
 
+    .items {
+        display: flex;
+        flex-direction: column;
+        /* Mudado para coluna */
+        align-items: center;
+        /* Alinha os itens ao centro */
+        margin-top: 10px;
+        width: 100%;
+    }
+
     .item {
         display: flex;
         justify-content: space-between;
-        margin: 3px 0;
+        /* Ajustado para espaçar corretamente */
+        width: 80%;
+        /* Toma toda a largura disponível */
+        margin-bottom: 5px;
+        font-size: 12px;
     }
 
     .total {
+        align-items: center;
+        margin-right: 5px;
         font-weight: bold;
-        margin-top: 10px;
+        margin-top: 5px;
+        font-size: 11px;
     }
 
     .footer {
         font-size: 10px;
         font-weight: bold;
-        margin-top: 20px;
+        margin-top: 10px;
     }
 
     @media print {
@@ -72,25 +95,30 @@ $change = max(0, $total_paid - $sale['total_amount']);
             display: none;
         }
     }
+
     .button-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .print-button, .close-button {
-            padding: 8px 16px;
-            margin: 0 5px;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-        }
-        .print-button {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .close-button {
-            background-color: #f44336;
-            color: white;
-        }
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .print-button,
+    .close-button {
+        padding: 8px 16px;
+        margin: 0 5px;
+        cursor: pointer;
+        border: none;
+        border-radius: 4px;
+    }
+
+    .print-button {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .close-button {
+        background-color: #f44336;
+        color: white;
+    }
     </style>
 </head>
 
@@ -105,72 +133,49 @@ $change = max(0, $total_paid - $sale['total_amount']);
 
     <div class="divider"></div>
 
-    <?php foreach ($sale_items as $item): ?>
-    <div class="item">
-        <span><?php echo htmlspecialchars(get_product_name($item['product_id'])); ?>
-            x<?php echo $item['quantity']; ?></span>
-        <span><?php echo number_format($item['quantity'] * $item['unit_price'], 2); ?> MT</span>
-    </div>
-    <?php endforeach; ?>
-
-    <div class="divider"></div>
-
-    <div class="total">
+    <div class="items">
+        <?php foreach ($sale_items as $item): ?>
         <div class="item">
+            <span><?php echo htmlspecialchars(get_product_name($item['product_id'])); ?>
+                x<?php echo $item['quantity']; ?></span>
+            <span><?php echo number_format($item['quantity'] * $item['unit_price'], 2); ?> </span>
+        </div>
+        <?php endforeach; ?>
+        <div style="font-weight: bold; border-top: 1px dashed #000; width:100%"></div>
+        <div class="item" style="font-weight: bold;">
             <span>Total:</span>
-            <span><?php echo number_format($sale['total_amount'], 2); ?> MT</span>
+            <span><?php echo number_format($sale['total_amount'], 2); ?> </span>
         </div>
     </div>
-
     <div class="divider"></div>
-
-    <div class="payment-methods">
-        <h4>Métodos de Pagamento:</h4>
-        <?php if ($sale['cash_amount'] > 0): ?><p>Dinheiro: <?php echo number_format($sale['cash_amount'], 2); ?> MT</p>
-        <?php endif; ?>
-        <?php if ($sale['card_amount'] > 0): ?><p>Cartão: <?php echo number_format($sale['card_amount'], 2); ?> MT</p>
-        <?php endif; ?>
-        <?php if ($sale['mpesa_amount'] > 0): ?><p>M-Pesa: <?php echo number_format($sale['mpesa_amount'], 2); ?> MT</p>
-        <?php endif; ?>
-        <?php if ($sale['emola_amount'] > 0): ?><p>Emola: <?php echo number_format($sale['emola_amount'], 2); ?> MT</p>
-        <?php endif; ?>
-        <p>Total Pago: <?php echo number_format($total_paid, 2); ?> MT</p>
-        <?php if ($change > 0): ?><p>Troco: <?php echo number_format($change, 2); ?> MT</p><?php endif; ?>
-    </div>
-
     <div class="footer">
         <p>Obrigado pela sua preferência!</p>
         <p>Este documento não serve como fatura</p>
         <p>Impresso em: <?php echo date('d/m/Y H:i:s'); ?></p>
     </div>
+
     <div class="no-print button-container">
-        <button class="print-button" onclick="printAndClose()">
+        <button class="print-button" onclick="printReceipt()">
             <i class="mdi mdi-printer"></i> Imprimir
         </button>
-        <button class="close-button" onclick="closeAndReturn()">
+        <button class="close-button" onclick="closeTab()">
             <i class="mdi mdi-close"></i> Fechar
         </button>
     </div>
+
     <script>
-    function imprimirRecibo() {
+    function printReceipt() {
         window.print();
-        // Aguarda 2 segundos e redireciona para a página anterior
-        setTimeout(function() {
-            window.history.back();
-        }, 2000);
+        setTimeout(closeTab, 2000); // Aguarda 2 segundos e então fecha a aba
     }
 
-     // Função para fechar a janela e redirecionar para pedidos
-     function closeAndReturn() {
-        window.location.href = "sales.php";
+    function closeTab() {
+        window.close(); // Fecha a aba do navegador
     }
 
     // Imprime automaticamente ao carregar a página
     window.onload = function() {
-        window.print();
-
-        // Simula um clique para fechar e redirecionar após 2 segundos
-        setTimeout(closeAndReturn, 500);
+        printReceipt();
     };
     </script>
 

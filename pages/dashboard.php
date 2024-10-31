@@ -17,9 +17,9 @@ foreach ($sales_data as $data) {
         'value' => (float)$data['total_amount']
     ];
 }
+
 // Passando os dados formatados para o gráfico em formato JSON
 $json_sales_data = json_encode($formatted_sales_data);
-
 
 include '../includes/header.php';
 ?>
@@ -105,6 +105,20 @@ include '../includes/header.php';
     padding: 1.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     margin-top: 1.5rem;
+}
+#search-results {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+
+.search-result-item {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.search-result-item:hover {
+    background-color: #f1f1f1;
 }
 
 @keyframes fadeIn {
@@ -278,13 +292,13 @@ include '../includes/header.php';
     </div>
 
     <div class="row">
-        <!-- Gráfico de Vendas -->
+        <!-- Gráfico de Vendas por Hora -->
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Vendas Diárias</h4>
+                    <h4 class="card-title">Vendas por Hora</h4>
                     <div class="chart-container" style="position: relative; height:300px;">
-                        <canvas id="dailySalesChart"></canvas>
+                        <canvas id="hourlySalesChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -329,19 +343,19 @@ include '../includes/header.php';
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Dados para o gráfico diário (vendas por hora)
-    const dailySalesLabels = <?php echo json_encode(array_column($sales_data, 'hour')); ?>;
-    const dailySalesData = <?php echo json_encode(array_column($sales_data, 'value')); ?>;
+    // Dados para o gráfico de vendas por hora
+    const hourlySalesLabels = <?php echo json_encode(array_column($formatted_sales_data, 'hour')); ?>;
+    const hourlySalesData = <?php echo json_encode(array_column($formatted_sales_data, 'value')); ?>;
 
-    // Configuração do gráfico de vendas diárias
-    const ctxDaily = document.getElementById('dailySalesChart').getContext('2d');
-    new Chart(ctxDaily, {
-        type: 'bar',
+    // Configuração do gráfico de vendas por hora
+    const ctxHourly = document.getElementById('hourlySalesChart').getContext('2d');
+    new Chart(ctxHourly, {
+        type: 'line',
         data: {
-            labels: dailySalesLabels,
+            labels: hourlySalesLabels,
             datasets: [{
                 label: 'Vendas (MZN)',
-                data: dailySalesData,
+                data: hourlySalesData,
                 borderColor: '#4f46e5',
                 backgroundColor: 'rgba(79, 70, 229, 0.1)',
                 tension: 0.4,
@@ -351,11 +365,6 @@ document.addEventListener('DOMContentLoaded', function() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
             scales: {
                 y: {
                     beginAtZero: true,
@@ -373,6 +382,35 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+document.getElementById('search-input').addEventListener('keyup', function() {
+    const searchTerm = this.value;
+    const categoryFilter = ""; // Inclua o filtro de categoria, se necessário
+
+    if (searchTerm.length > 1) {
+        fetch(`products.php?search=${encodeURIComponent(searchTerm)}&category=${categoryFilter}&ajax=true`)
+            .then(response => response.json())
+            .then(data => {
+                const searchResults = document.getElementById('search-results');
+                searchResults.innerHTML = '';
+
+                if (data.length > 0) {
+                    data.forEach(product => {
+                        const item = document.createElement('div');
+                        item.textContent = product.name;
+                        item.className = 'search-result-item';
+                        searchResults.appendChild(item);
+                    });
+                    searchResults.style.display = 'block';
+                } else {
+                    searchResults.style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+    } else {
+        document.getElementById('search-results').style.display = 'none';
+    }
+});
+
 </script>
 
 <?php include '../includes/footer.php'; ?>

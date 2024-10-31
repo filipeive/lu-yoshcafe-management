@@ -101,9 +101,40 @@ function order_add_item($order_id, $product_id, $quantity) {
 
 function order_update_total($order_id) {
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE orders SET total_amount = (SELECT SUM(oi.quantity * p.price) FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?) WHERE id = ?");
-    $stmt->execute([$order_id, $order_id]);
+    $stmt = $pdo->prepare("
+        UPDATE orders 
+        SET total_amount = (
+            SELECT SUM(oi.quantity * p.price) 
+            FROM order_items oi 
+            JOIN products p ON oi.product_id = p.id 
+            WHERE oi.order_id = :order_id
+        ) 
+        WHERE id = :order_id
+    ");
+    $stmt->bindValue(':order_id', $order_id, PDO::PARAM_INT);
+    $stmt->execute();
 }
+function update_order_total($order_id) {
+    global $pdo;
+
+    // Calcula o novo total somando os itens do pedido
+    $stmt = $pdo->prepare("
+        SELECT SUM(order_items.quantity * products.price) as new_total
+        FROM order_items
+        JOIN products ON order_items.product_id = products.id
+        WHERE order_items.order_id = :order_id
+    ");
+    $stmt->bindValue(':order_id', $order_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $new_total = $stmt->fetchColumn();
+
+    // Atualiza o total do pedido na tabela `orders`
+    $stmt = $pdo->prepare("UPDATE orders SET total_amount = :new_total WHERE id = :order_id");
+    $stmt->bindValue(':new_total', $new_total, PDO::PARAM_STR);
+    $stmt->bindValue(':order_id', $order_id, PDO::PARAM_INT);
+    $stmt->execute();
+}
+
 
 function order_complete_and_generate_sale($order_id) {
     global $pdo;
@@ -196,4 +227,74 @@ function get_paginated_order($offset, $per_page) {
     $stmt->execute();
     
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+function remove_item_from_order($order_id, $item_id) {
+    global $pdo;
+
+    $stmt = $pdo->prepare("DELETE FROM order_items WHERE order_id = :order_id AND id = :item_id");
+    $stmt->bindValue(':order_id', $order_id, PDO::PARAM_INT);
+    $stmt->bindValue(':item_id', $item_id, PDO::PARAM_INT);
+    $stmt->execute();
+}
+
+function remove_order($order_id) {
+    global $pdo;
+    
+    try {
+        $pdo->beginTransaction();
+
+        // Primeiro, remove os itens associados ao pedido
+        $stmt = $pdo->prepare("DELETE FROM order_items WHERE order_id = :order_id");
+        $stmt->bindValue(':order_id', $order_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        // Depois, remove o pedido
+        $stmt = $pdo->prepare("DELETE FROM orders WHERE id = :order_id");
+        $stmt->bindValue(':order_id', $order_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $pdo->commit();
+        return true;
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        return false;
+    }
+}
+
+// function_orders.php
+function cancel_order($order_id) {
+    global $pdo;
+    
+    try {
+        $pdo->beginTransaction();
+        error_log("Iniciando o cancelamento do pedido $order_id");
+
+        // Atualiza o status do pedido para "cancelled"
+        $stmt = $pdo->prepare("UPDATE orders SET status = 'canceled' WHERE id = :order_id");
+        $stmt->bindValue(':order_id', $order_id, PDO::PARAM_INT);
+        $stmt->execute();
+        error_log("Status do pedido atualizado para 'cancelled' para o pedido $order_id");
+
+        // Verifica se o pedido tem uma mesa associada
+        $stmt = $pdo->prepare("SELECT table_id FROM orders WHERE id = :order_id");
+        $stmt->bindValue(':order_id', $order_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $order = $stmt->fetch();
+
+        if ($order && $order['table_id']) {
+            // Libera a mesa associada ao pedido
+            $stmt = $pdo->prepare("UPDATE tables SET status = 'free' WHERE id = :table_id");
+            $stmt->bindValue(':table_id', $order['table_id'], PDO::PARAM_INT);
+            $stmt->execute();
+            error_log("Mesa liberada para o pedido $order_id");
+        }
+
+        $pdo->commit();
+        error_log("Pedido $order_id cancelado com sucesso");
+        return true;
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        error_log("Erro ao cancelar pedido $order_id: " . $e->getMessage()); // Log detalhado
+        return false;
+    }
 }

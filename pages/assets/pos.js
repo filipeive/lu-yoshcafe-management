@@ -33,7 +33,7 @@ function updateCartDisplay() {
         itemElement.innerHTML = `
             <div class="cart-item-info">
                 <h6 class="mb-0">${item.name}</h6>
-                <small class="text-muted">MZN ${item.price.toFixed(2)} x ${item.quantity}</small>
+                <small class="text-muted"> ${item.price.toFixed(2)} x ${item.quantity}</small>
             </div>
             <div class="cart-item-controls">
                 <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${index}, -1)">-</button>
@@ -80,7 +80,7 @@ function updateCartDisplay() {
         itemElement.innerHTML = `
             <div class="cart-item-info">
                 <h6 class="mb-0">${item.name}</h6>
-                <small class="text-muted">MZN ${item.price.toFixed(2)} x ${item.quantity}</small>
+                <small class="text-muted"> ${item.price.toFixed(2)} x ${item.quantity}</small>
             </div>
             <div class="cart-item-controls">
                 <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${index}, -1)">-</button>
@@ -120,8 +120,8 @@ function removeItem(index) {
 // Função para calcular totais
 function calculateTotals() {
     const subtotal = saleItems.reduce((sum, item) => sum + item.total, 0);
-    document.getElementById('subtotal').textContent = `MZN ${subtotal.toFixed(2)}`;
-    document.getElementById('total').textContent = `MZN ${subtotal.toFixed(2)}`;
+    document.getElementById('subtotal').textContent = ` ${subtotal.toFixed(2)}`;
+    document.getElementById('total').textContent = ` ${subtotal.toFixed(2)}`;
     calculateChange();
 }
 
@@ -136,7 +136,7 @@ function selectPayment(method) {
 
 // Função para calcular troco
 function calculateChange() {
-    const total = parseFloat(document.getElementById('total').textContent.replace('MZN ', ''));
+    const total = parseFloat(document.getElementById('total').textContent.replace(' ', ''));
     const cashAmount = parseFloat(document.getElementById('cashAmount').value) || 0;
     const cardAmount = parseFloat(document.getElementById('cardAmount').value) || 0;
     const mpesaAmount = parseFloat(document.getElementById('mpesaAmount').value) || 0;
@@ -145,7 +145,7 @@ function calculateChange() {
     const totalPaid = cashAmount + cardAmount + mpesaAmount + emolaAmount;
     const change = totalPaid - total;
     
-    document.getElementById('changeAmount').value = change >= 0 ? `MZN ${change.toFixed(2)}` : 'Pagamento insuficiente';
+    document.getElementById('changeAmount').value = change >= 0 ? ` ${change.toFixed(2)}` : 'Pagamento insuficiente';
     document.getElementById('btnFinalizeOrder').disabled = change < 0;
 }
 
@@ -156,7 +156,7 @@ async function processSale() {
         return;
     }
 
-    const total = parseFloat(document.getElementById('total').textContent.replace('MZN ', ''));
+    const total = parseFloat(document.getElementById('total').textContent.replace(' ', ''));
     const saleData = {
         items: saleItems,
         cashPayment: parseFloat(document.getElementById('cashAmount').value) || 0,
@@ -272,22 +272,25 @@ function generateReceiptContent(isPreview = false) {
             <title>${isPreview ? 'Pré-visualização do Recibo' : 'Recibo'}</title>
             <style>
                 body {
-                    font-family: 'Courier New', monospace;
+                    font-family: 'arial', monospace;
                     margin: 0;
                     padding: 10px;
-                    font-size: 12px;
+                    font-size: 15px;
                 }
                 .receipt {
-                    max-width: 300px;
+                    max-width: 250px;
                     margin: 0 auto;
                 }
                 .header {
                     text-align: center;
-                    margin-bottom: 20px;
+                    margin-bottom: 5px;
                 }
                 .logo {
                     max-width: 100px;
-                    margin-bottom: 10px;
+                    margin-bottom: 5px;
+                }
+                .header img {
+                    max-width: 120px;
                 }
                 .divider {
                     border-top: 1px dashed #000;
@@ -305,7 +308,7 @@ function generateReceiptContent(isPreview = false) {
                 }
                 .footer {
                     text-align: center;
-                    font-size: 10px;
+                    font-size: 12px;
                     margin-top: 20px;
                 }
                 @media print {
@@ -325,6 +328,7 @@ function generateReceiptContent(isPreview = false) {
         <body>
             <div class="receipt">
                 <div class="header">
+                    <img src="../public/assets/images/Logo.png" alt="Lu & Yosh Catering Logo">
                     <h2>Lu & Yosh Catering</h2>
                     <div class="company-info">
                         <p>Av. Eduardo Mondlane, 1234<br>Quelimane, Moçambique<br>Tel: +258 21 123 456<br>NUIT: 123456789</p>
@@ -350,8 +354,8 @@ function generateReceiptContent(isPreview = false) {
                                 <tr>
                                     <td>${item.name}</td>
                                     <td style="text-align: right;">${item.quantity}</td>
-                                    <td style="text-align: right;">MZN ${item.price.toFixed(2)}</td>
-                                    <td style="text-align: right;">MZN ${item.total.toFixed(2)}</td>
+                                    <td style="text-align: right;"> ${item.price.toFixed(2)}</td>
+                                    <td style="text-align: right;"> ${item.total.toFixed(2)}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -361,18 +365,18 @@ function generateReceiptContent(isPreview = false) {
                 <div class="totals">
                     <div class="item">
                         <strong>Total:</strong>
-                        <span>MZN ${total.toFixed(2)}</span>
+                        <span> ${total.toFixed(2)}</span>
                     </div>
                 </div>
                 
                 <div class="payment-methods">
                     <h4>Método de Pagamento:</h4>
-                    ${cashAmount > 0 ? `<div class="item">Dinheiro: <span>MZN ${cashAmount.toFixed(2)}</span></div>` : ''}
-                    ${cardAmount > 0 ? `<div class="item">Cartão: <span>MZN ${cardAmount.toFixed(2)}</span></div>` : ''}
-                    ${mpesaAmount > 0 ? `<div class="item">M-Pesa: <span>MZN ${mpesaAmount.toFixed(2)}</span></div>` : ''}
-                    ${emolaAmount > 0 ? `<div class="item">E-mola: <span>MZN ${emolaAmount.toFixed(2)}</span></div>` : ''}
-                    <div class="item"><strong>Total Pago:</strong><span>MZN ${totalPaid.toFixed(2)}</span></div>
-                    ${change > 0 ? `<div class="item">Troco: <span>MZN ${change.toFixed(2)}</span></div>` : ''}
+                    ${cashAmount > 0 ? `<div class="item">Dinheiro: <span> ${cashAmount.toFixed(2)}</span></div>` : ''}
+                    ${cardAmount > 0 ? `<div class="item">Cartão: <span> ${cardAmount.toFixed(2)}</span></div>` : ''}
+                    ${mpesaAmount > 0 ? `<div class="item">M-Pesa: <span> ${mpesaAmount.toFixed(2)}</span></div>` : ''}
+                    ${emolaAmount > 0 ? `<div class="item">E-mola: <span> ${emolaAmount.toFixed(2)}</span></div>` : ''}
+                    <div class="item"><strong>Total Pago:</strong><span> ${totalPaid.toFixed(2)}</span></div>
+                    ${change > 0 ? `<div class="item">Troco: <span> ${change.toFixed(2)}</span></div>` : ''}
                 </div>
                 
                 <div class="divider"></div>

@@ -39,69 +39,99 @@ $company_phone = "+258 21 123 456";
 ?>
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <title>Recibo #<?php echo str_pad($order_id, 5, '0', STR_PAD_LEFT); ?></title>
     <style>
-        @page{
-            size: 58mm 297mm;
-            margin: 0;
+    @page {
+        size: 58mm 297mm;
+        margin: 0;
+    }
+
+    @media print {
+        .no-print {
+            display: none;
         }
-        @media print {
-            .no-print {
-                display: none;
-            }
-        }
-        body {
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            width: 58mm;
-            margin: 0 auto;
-            padding: 5mm;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        .divider {
-            border-top: 1px dashed #000;
-            margin: 5px 0;
-        }
-        .item {
-            display: flex;
-            justify-content: space-between;
-            margin: 5px 0;
-        }
-        .total {
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 10px;
-        }
-        .button-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .print-button, .close-button {
-            padding: 8px 16px;
-            margin: 0 5px;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-        }
-        .print-button {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .close-button {
-            background-color: #f44336;
-            color: white;
-        }
+    }
+
+    body {
+        font-family: 'Arial';
+        font-size: 12px;
+        width: 58mm 297mm;
+        margin: auto;
+        padding: 5px;
+        color: #000;
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .divider {
+        border-top: 1px dashed #000;
+        margin: 5px 0;
+    }
+
+    .items {
+        display: flex;
+        flex-direction: column;
+        /* Mudado para coluna */
+        align-items: space-between;
+        /* Alinha os itens ao centro */
+        margin-top: 10px;
+        width: 80%;
+    }
+
+    .item {
+        display: flex;
+        justify-content: space-between;
+        width: 80%;
+        margin-bottom: 5px;
+        font-size: 12px;
+    }
+
+    .total {
+        align-items: center;
+        margin-right: 5px;
+        font-weight: bold;
+        margin-top: 5px;
+        font-size: 11px;
+    }
+
+    .footer {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 10px;
+    }
+
+    .button-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .print-button,
+    .close-button {
+        padding: 8px 16px;
+        margin: 0 5px;
+        cursor: pointer;
+        border: none;
+        border-radius: 4px;
+    }
+
+    .print-button {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .close-button {
+        background-color: #f44336;
+        color: white;
+    }
     </style>
 </head>
+
 <body>
     <div class="header">
         <h2><?php echo htmlspecialchars($company_name); ?></h2>
@@ -119,7 +149,7 @@ $company_phone = "+258 21 123 456";
 
     <div class="divider"></div>
 
-    <div>
+    <div class="items">
         <?php foreach ($items as $item): ?>
         <div class="item">
             <span><?php echo $item['quantity']; ?>x <?php echo htmlspecialchars($item['product_name']); ?></span>
@@ -131,10 +161,8 @@ $company_phone = "+258 21 123 456";
     <div class="divider"></div>
 
     <div class="total">
-        <div class="item">
-            <span>Total:</span>
-            <span>MZN <?php echo number_format($order['total_amount'], 2); ?></span>
-        </div>
+        <span>Total:</span>
+        <span>MZN <?php echo number_format($order['total_amount'], 2); ?></span>
     </div>
 
     <div class="footer">
@@ -157,14 +185,22 @@ $company_phone = "+258 21 123 456";
         window.location.href = "orders.php";
     }
 
+    function closeTab() {
+        window.close(); // Fecha a aba do navegador
+    }
+
+    // Imprime automaticamente ao carregar a página
+    window.onload = function() {
+        printAndClose();
+    };
     // Imprime automaticamente ao carregar a página
     window.onload = function() {
         window.print();
-
         // Simula um clique para fechar e redirecionar após 2 segundos
-        setTimeout(closeAndReturn, 500);
+        setTimeout(closeAndReturn, 1000);
     };
-</script>
+    </script>
 
 </body>
+
 </html>
