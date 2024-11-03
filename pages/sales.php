@@ -254,11 +254,10 @@ $products = get_all_products();
                             </div>
                         </div>
                         <!-- New Sale Button -->
-                        <button type="button" class="btn btn-primary btn-icon-text px-4" data-bs-toggle="modal"
-                            data-bs-target="#newSaleModal">
+                        <a href="pos.php" class="btn btn-primary btn-icon-text px-4">
                             <i class="mdi mdi-plus btn-icon-prepend"></i>
                             Nova Venda
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -377,9 +376,12 @@ $products = get_all_products();
         </div>
     </div>
     <?php include 'modais/modais_venda.php'; ?>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="assets/jquery-3.7.1.min.js"></script>
+    <script src="assets/jquery.dataTables.min.js"></script>
+    <script src="assets/dataTables.bootstrap5.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/sweetalert2@10"></script>
+    <script src="assets/chart.js"></script>
     <script>
     // Variáveis globais
     let saleItems = [];

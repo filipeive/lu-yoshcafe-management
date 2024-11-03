@@ -125,6 +125,10 @@ include '../includes/header.php';
                                 </h5>
                                 <?php if ($table['group_id']): ?>
                                 <span class="badge badge-info">Unida</span>
+                                <button type="button" class="btn btn-danger btn-sm split-table"
+                                    data-table-id="<?php echo $table['id']; ?>">
+                                    Separar Mesa
+                                </button>
                                 <?php endif; ?>
                             </div>
                             <div class="card-body text-center">

@@ -182,7 +182,7 @@ try {
                         </a>
                     </li>
                     <?php endif; ?>
-
+                     <?php /*
                     <?php if ($_SESSION['role'] == 'admin'): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="customers.php">
@@ -198,7 +198,7 @@ try {
                             <span class="menu-title">Funcionários</span>
                         </a>
                     </li>
-                    <?php endif; ?>
+                    <?php endif; */?>
 
                     <?php if ($_SESSION['role'] == 'admin'): ?>
                     <li class="nav-item">

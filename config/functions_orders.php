@@ -15,7 +15,7 @@ function order_get_total_today() {
 
 function order_get_open_count() {
     global $pdo;
-    $stmt = $pdo->query("SELECT COUNT(*) FROM orders WHERE status != 'completed'");
+    $stmt = $pdo->query("SELECT COUNT(*) FROM orders WHERE status NOT IN ('completed', 'canceled')");
     return $stmt->fetchColumn();
 }
 

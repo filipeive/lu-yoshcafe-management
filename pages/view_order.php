@@ -191,7 +191,7 @@ function getStatusBadge($status) {
                                         </a>
                                     </div>
                                     <div>
-                                        <?php if ($order['status'] != 'completed'): ?>
+                                        <?php if ($order['status'] != 'completed' && $order['status'] != 'canceled'): ?>
                                         <a href="gerir_pedidos/complete_order.php?id=<?php echo $order['id']; ?>"
                                             class="btn btn-success me-2"
                                             onclick="return confirm('Tem certeza que deseja finalizar este pedido?')">

@@ -347,7 +347,8 @@ $total_pages = ceil($total_orders / $per_page);
                                             title="Imprimir">
                                             <i class="mdi mdi-printer"></i>
                                         </a>
-                                        <?php if ($order['status'] != 'completed'): ?>
+
+                                        <?php if ($order['status'] != 'completed' && $order['status'] != 'canceled'): ?>
                                         <a href="edit_order.php?id=<?php echo $order['id']; ?>"
                                             class="btn btn-warning btn-icon btn-sm" data-bs-toggle="tooltip"
                                             title="Editar">
@@ -370,7 +371,6 @@ $total_pages = ceil($total_orders / $per_page);
                         </tbody>
                     </table>
                 </div>
-
                 <!-- Paginação -->
                 <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-3">
                     <div class="text-muted">
